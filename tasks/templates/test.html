@@ -11,5 +11,13 @@
 <body>
     <h1 class="green-bg">all are ok now</h1>
     <img src="{% static 'images/soldures.jpg' %}" alt="">
+    <br>
+    <hr>
+
+    {% for name in names %}
+        {% if not name == 'Appolo' %}
+            <p style="font-size: 40px">{{name}}</p>
+        {% endif %}
+    {% endfor %}
 </body>
 </html>
