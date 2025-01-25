@@ -12,4 +12,5 @@ def show_task(request):
     return HttpResponse("This page is all about show task.")
 
 def show_specific_task(request, id):
-    return HttpResponse("This is task: ")
+    print(type(id))
+    return HttpResponse(f"This is task: {id}")
