@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from tasks.forms import TaskForm
+from tasks.models import Employee
 
 # Create your views here.
 def dashboard(request):
@@ -18,5 +20,8 @@ def test_file(request):
     }
     return render(request, 'test.html', context)
 
-def input_form(request):
-    return render(request, "form.html")
+def create_task(request):
+    employees = Employee.objects.all()
+    form = TaskForm(employees = employees)
+    context = {"form_a": form}
+    return render(request, "form.html", context)

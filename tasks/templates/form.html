@@ -6,13 +6,15 @@
     <title>Post and Get mathod</title>
 </head>
 <body>
-    {% comment %} <form method='GET'> {% endcomment %}
+    {% comment %}
+    Mainly two types of request
+    1. GET = It will show in url
+    2. POST = It will never show in url. for privacy
+    {% endcomment %}
+    {% comment %}<form method='GET'>{% endcomment %}
     <form method='POST'>
         {% csrf_token %}
-        <label for="">Title</label>
-        <input type="text" name="title" id="">
-        <label for="">Number</label>
-        <input type="number" name="num" id="">
+        {{ form_a.as_p}}
         <button>Submit</button>
     </form>
 </body>
