@@ -14,12 +14,8 @@ class TaskForm(forms.Form):
         )
 
     def __init__(self, *args, **kwargs):
-        # print(args, kwargs)
         employees = kwargs.pop("employees", [])
-        # print(args, kwargs)
-        # print(employees)
         super().__init__(*args, **kwargs)
-        # print("Pointer is here:",self.fields['assigned_to'])
         self.fields['assigned_to'].choices = [
             (emp.id, emp.name) for emp in employees
         ]
