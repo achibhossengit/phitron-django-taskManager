@@ -18,3 +18,5 @@ def test_file(request):
     }
     return render(request, 'test.html', context)
 
+def input_form(request):
+    return render(request, "form.html")
