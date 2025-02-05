@@ -1,4 +1,7 @@
 from django import forms
+from tasks.models import Task
+
+
 class TaskForm(forms.Form):
     title = forms.CharField(max_length=250)
     description = forms.CharField(widget=forms.Textarea)
@@ -6,10 +9,19 @@ class TaskForm(forms.Form):
     assigned_to = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=[])
 
     def __init__(self, *args, **kwargs):
-        # employees = kwargs.get('employees', [])
-        # kwargs.pop('employees', [])
         employees = kwargs.pop('employees',[])
-
         super().__init__(*args, **kwargs)
-        # print(self.fields)
         self.fields['assigned_to'].choices = [(emp.id, emp.name) for emp in employees]
+
+
+    
+class TaskModelForm(forms.ModelForm):    
+    class Meta:
+        model = Task
+        # fields = "__all__"
+        fields = ["title", "description", "due_date", "assigned_to"]
+        # exclude = ["project", "is_completed"]
+        widgets = {
+            'due_date': forms.SelectDateWidget,
+            'assigned_to': forms.CheckboxSelectMultiple
+            }

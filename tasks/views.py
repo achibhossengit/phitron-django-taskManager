@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from tasks.forms import TaskForm
+from tasks.forms import TaskForm, TaskModelForm
 from tasks.models import  Task, Employee
+from django.http import HttpResponse
 
 # Create your views here.
 def dashboard(request):
@@ -23,20 +24,31 @@ def test_file(request):
 def create_task(request):
     employees = Employee.objects.all()
     # print(employees)
-    form = TaskForm(employees = employees)
+    # form = TaskForm(employees = employees)
+    form = TaskModelForm()
     if request.method == 'POST':
-        form = TaskForm(request.POST, employees = employees)
+        # form = TaskForm(request.POST, employees = employees)
+        form = TaskModelForm(request.POST)
         if form.is_valid():
-            data = form.cleaned_data # here, data is a dictionary
-            title = data.get('title') # get: to access dictionary data, if dictionary have't title key, its return none
-            description = data.get('description')
-            due_date = data.get('due_date')
-            assigned_to = data.get('assigned_to') # here, is a many to many relations
+            """ for Model form """
+            form.save()
 
-            task = Task.objects.create(title=title, description = description, due_date=due_date)
-            for emp_id in assigned_to:
-                employee = Employee.objects.get(id = emp_id)
-                task.assigned_to.add(employee)
+            message = "Task added successfully!"
+            return render(request, 'create_task.html', {'form': form, 'message': message})
+
+            """ for Django Form data"""
+            # data = form.cleaned_data # here, data is a dictionary
+            # title = data.get('title') # get: to access dictionary data, if dictionary have't title key, its return none
+            # description = data.get('description')
+            # due_date = data.get('due_date')
+            # assigned_to = data.get('assigned_to') # here, is a many to many relations
+
+            # task = Task.objects.create(title=title, description = description, due_date=due_date)
+            # for emp_id in assigned_to:
+            #     employee = Employee.objects.get(id = emp_id)
+            #     task.assigned_to.add(employee)
+
+            # return HttpResponse("Task added successfully!")
 
     context = {'form':form}
     return render(request, 'create_task.html', context)
