@@ -22,6 +22,9 @@ class TaskModelForm(forms.ModelForm):
         fields = ["title", "description", "due_date", "assigned_to"]
         # exclude = ["project", "is_completed"]
         widgets = {
+            'title':forms.TextInput(attrs={
+                'class':'border-2 rounded-md w-full'
+            }),
             'due_date': forms.SelectDateWidget,
             'assigned_to': forms.CheckboxSelectMultiple
             }

@@ -1,11 +1,15 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create a new task</title>
+    <link rel="stylesheet" href="{% static "CSS/output.css" %}">
 </head>
 <body>
+<div class="w-1/2 mx-auto">
     <div>
         {% if message %}
             {{message}}
@@ -18,5 +22,6 @@
             <button type="submit">Submit</button>
         </form>
     </div>
+</div>
 </body>
 </html>
