@@ -2,6 +2,7 @@ from django.shortcuts import render
 from tasks.forms import TaskForm, TaskModelForm
 from tasks.models import  Task, Employee, TaskDetail
 from django.http import HttpResponse
+from django.db.models import Q
 
 # Create your views here.
 def dashboard(request):
@@ -54,11 +55,20 @@ def create_task(request):
     return render(request, 'create_task.html', context)
 
 def show_all_tasks(request):
-    # data retrive
-    tasks = Task.objects.all()
-    task_2 = Task.objects.get(id=2)
-    first_task = Task.objects.first()
-    # get can't return more than one objects thats why
-    pending_tasks = Task.objects.filter(status="PENDING")
-    not_low_task = TaskDetail.objects.exclude(priority = 'L')
-    return render(request, 'show_tasks.html', {'tasks': tasks, 'task2': task_2, 'first_task':first_task, 'pending_tasks': pending_tasks, 'not_low_tasks':not_low_task})
+    """ Data Retrive """
+    # tasks = Task.objects.all()
+    # task_2 = Task.objects.get(id=2)
+    # first_task = Task.objects.first()
+    # # get can't return more than one objects thats why
+    # pending_tasks = Task.objects.filter(status="PENDING")
+    # not_low_task = TaskDetail.objects.exclude(priority = 'L')
+    # return render(request, 'show_tasks.html', {'tasks': tasks, 'task2': task_2, 'first_task':first_task, 'pending_tasks': pending_tasks, 'not_low_tasks':not_low_task})
+    
+    # search_word = "t"
+    # search_and = Task.objects.filter(title__icontains=search_word, status= 'PENDING')
+    # search_or = Task.objects.filter(Q(status='PENDING') | Q(status='IN_PROGRESS'))
+    # return render(request, 'show_tasks.html', {'and_tasks': search_and, 'or_tasks': search_or})
+
+    # filter can return a empty query set
+    is_exits = Task.objects.filter(status= 'khjhjhsdf').exists()
+    return render (request, 'show_tasks.html', {'is_exits': is_exits})
