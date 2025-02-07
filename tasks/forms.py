@@ -20,7 +20,7 @@ class StyledFormMixin:
     #     super().__init__(*args, **kwargs)
     #     self.apply_default_classes()
 
-    default_classes = 'border-2 rounded-md w-full p-3 my-5'
+    default_classes = 'border-2 rounded-md w-full p-3'
 
     def apply_default_classes(self):
         for field_name, field in self.fields.items():
@@ -32,7 +32,8 @@ class StyledFormMixin:
             elif isinstance(field.widget, forms.Textarea):
                 field.widget.attrs.update({
                     'class': f'{self.default_classes} ',
-                    'placeholder': f'Enter {field.label.lower()}'
+                    'placeholder': f'Enter {field.label.lower()}',
+                    'rows': 5
                 })
             elif isinstance(field.widget, forms.SelectDateWidget):
                 # print("inside date filed")
@@ -40,9 +41,8 @@ class StyledFormMixin:
                     'class': 'border-2 rounded-md my-5'
                 })
             elif isinstance(field.widget, forms.CheckboxSelectMultiple):
-                # print("inside assigned to")
                 field.widget.attrs.update({
-                    'class': 'my-5'
+                    'class': 'mb-3'
                 })
     
 class TaskModelForm(StyledFormMixin, forms.ModelForm):    
