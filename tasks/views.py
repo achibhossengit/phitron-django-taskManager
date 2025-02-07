@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from tasks.forms import TaskForm, TaskModelForm
-from tasks.models import  Task, Employee
+from tasks.models import  Task, Employee, TaskDetail
 from django.http import HttpResponse
 
 # Create your views here.
@@ -58,4 +58,7 @@ def show_all_tasks(request):
     tasks = Task.objects.all()
     task_2 = Task.objects.get(id=2)
     first_task = Task.objects.first()
-    return render(request, 'show_tasks.html', {'tasks': tasks, 'task2': task_2, 'first_task':first_task})
+    # get can't return more than one objects thats why
+    pending_tasks = Task.objects.filter(status="PENDING")
+    not_low_task = TaskDetail.objects.exclude(priority = 'L')
+    return render(request, 'show_tasks.html', {'tasks': tasks, 'task2': task_2, 'first_task':first_task, 'pending_tasks': pending_tasks, 'not_low_tasks':not_low_task})

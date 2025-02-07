@@ -7,9 +7,28 @@
 </head>
 <body>
     <div>
+        <h1>All of your tasks:</h1>
         <ul>
             {% for task in  tasks%}
                 <li>{{task}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
+        <h1>Pending tasks list:</h1>
+        <ul>
+            {% for task in pending_tasks %}
+                <li> {{task.title}} </li>
+                <span> {{task.status}} </span>
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
+        <h1>List of Not Low tasks:</h1>
+        <ul>
+            {% for task in not_low_tasks %}
+                <p> {{task.task}} </p>
+                <span> {{task.priority}} </span>
             {% endfor %}
         </ul>
     </div>
