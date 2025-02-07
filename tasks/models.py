@@ -11,7 +11,7 @@ class Employee(models.Model):
 class Task(models.Model):
     STATUS_OPTIONS = (
         ("PENDING", 'Pending'),
-        ("PROGRESS", 'Progress'),
+        ("IN_PROGRESS", 'In Progress'),
         ("COMPLETED", 'Completed')
     )
     status = models.CharField(max_length=15, choices=STATUS_OPTIONS, default="PENDING")
