@@ -1,39 +1,39 @@
 from django.db import models
 
-# Create your models here.
-
 class Employee(models.Model):
     name = models.CharField(max_length=50)
     email = models.EmailField(unique=True)
-    # task_set: reverse relations
-    # tasks: its changed by related_name
-    
+    # task_set: reverse relations-> tasks: its changed by related_name
     """ Dunder method: object-> string , it for model form"""
     def __str__(self):
         return self.name
 
 class Task(models.Model):
+    STATUS_OPTIONS = (
+        ("PENDING", 'Pending'),
+        ("PROGRESS", 'Progress'),
+        ("COMPLETED", 'Completed')
+    )
+    status = models.CharField(max_length=15, choices=STATUS_OPTIONS, default="PENDING")
+    # many to one
     project = models.ForeignKey(
         "project", 
         on_delete=models.CASCADE,
         default=1,
         related_name="tasks"
     )
+    # many to many
     assigned_to = models.ManyToManyField(Employee, related_name="tasks")
     title = models.CharField(max_length=250)
     description = models.TextField()
-    # description = models.CharField()
     due_date = models.DateField()
     is_completed = models.BooleanField(default=False)
     created_at  = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    # taskdetail: reverse relations
-    # details: its changed by related_name
+    # taskdetail: reverse relations -> details: changed by related_name
 
-
-# one to one
-# many to one
-# many to many
+    def __str__(self):
+        return self.title
 
 class TaskDetail(models.Model):
     HIGH = 'H'
@@ -44,6 +44,7 @@ class TaskDetail(models.Model):
         (MEDIUM, 'Medium'),
         (LOW, 'Low')
     )
+    # one to one
     task = models.OneToOneField(
         Task, 
         on_delete=models.CASCADE,
@@ -51,14 +52,20 @@ class TaskDetail(models.Model):
     )
     assigned_to = models.CharField(max_length=100)
     priority = models.CharField(max_length=1, choices=PRIORITY_OPTIONS, default = LOW)
-    
-# Task.objects.get(id=1)
-# select * from task where id=2
+    notes = models.TextField(blank=True, null=True)
+
 # ORM = Object Relational Maper
+# select * from task where id=2 -> Task.objects.get(id=1)
+
+    def __str__(self):
+        return f"Details of Task {self.task.title}"
 
 
 class Project(models.Model):
     name = models.CharField(max_length=100, default="Untitled")
+    description = models.CharField(blank=True, null=True)
     start_date = models.DateField(auto_now=True)
-    # tasks_set: reverse relations
-    # tasks: changed by related name
+    # tasks_set: reverse relations -> tasks
+
+    def __str__(self):
+        return self.name
