@@ -2,7 +2,7 @@ from django.shortcuts import render
 from tasks.forms import TaskForm, TaskModelForm
 from tasks.models import  Task, Employee, TaskDetail, Project
 from django.http import HttpResponse
-from django.db.models import Q
+from django.db.models import Q, Count, Max, Min, Avg
 
 # Create your views here.
 def dashboard(request):
@@ -55,27 +55,8 @@ def create_task(request):
     return render(request, 'create_task.html', context)
 
 def show_all_tasks(request):
-    """ Data Retrive """
+    """ Data Retrive (django aggregations)"""
 
-    # if we want to access taskdetail from tasks it will run query for each task seperatly
-    # all_task = Task.objects.all()
-
-
-    """its optimized it will run just one query (one to one relations)"""
-    # all_task = Task.objects.select_related('details')
-    # return render(request, "show_tasks.html", {'tasks': all_task})
-    # with reverse relations
-    # tasks_details = TaskDetail.objects.select_related('task')
-    # return render(request, 'show_tasks.html', {'all_details':tasks_details})
-
-    """for one to many(foreign key relations)"""
-    # tasks = Task.objects.select_related('project')
-    # # select_related is not working for reverse_realtions in one to manay relations
-    # return render(request, 'show_tasks.html', {"tasks":tasks})
-
-    """ prefetch_related (reverse_foreignkey, manaytomany)"""
-    # projects = Project.objects.prefetch_related('tasks').all()
-    # return render(request, 'show_tasks.html', {'projects': projects})
-
-    tasks = Task.objects.prefetch_related('assigned_to')
-    return render(request, 'show_tasks.html', {'tasks': tasks})
+    tasks = Task.objects.aggregate(net_task= Count('id'))
+    projects = Project.objects.annotate(net_task=Count('tasks')).order_by('net_task')
+    return render(request, 'show_tasks.html', {'tasks':tasks, 'projects':projects})
