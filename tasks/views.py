@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from tasks.forms import TaskForm, TaskModelForm
-from tasks.models import  Task, Employee, TaskDetail
+from tasks.models import  Task, Employee, TaskDetail, Project
 from django.http import HttpResponse
 from django.db.models import Q
 
@@ -56,19 +56,26 @@ def create_task(request):
 
 def show_all_tasks(request):
     """ Data Retrive """
-    # tasks = Task.objects.all()
-    # task_2 = Task.objects.get(id=2)
-    # first_task = Task.objects.first()
-    # # get can't return more than one objects thats why
-    # pending_tasks = Task.objects.filter(status="PENDING")
-    # not_low_task = TaskDetail.objects.exclude(priority = 'L')
-    # return render(request, 'show_tasks.html', {'tasks': tasks, 'task2': task_2, 'first_task':first_task, 'pending_tasks': pending_tasks, 'not_low_tasks':not_low_task})
-    
-    # search_word = "t"
-    # search_and = Task.objects.filter(title__icontains=search_word, status= 'PENDING')
-    # search_or = Task.objects.filter(Q(status='PENDING') | Q(status='IN_PROGRESS'))
-    # return render(request, 'show_tasks.html', {'and_tasks': search_and, 'or_tasks': search_or})
 
-    # filter can return a empty query set
-    is_exits = Task.objects.filter(status= 'khjhjhsdf').exists()
-    return render (request, 'show_tasks.html', {'is_exits': is_exits})
+    # if we want to access taskdetail from tasks it will run query for each task seperatly
+    # all_task = Task.objects.all()
+
+
+    """its optimized it will run just one query (one to one relations)"""
+    # all_task = Task.objects.select_related('details')
+    # return render(request, "show_tasks.html", {'tasks': all_task})
+    # with reverse relations
+    # tasks_details = TaskDetail.objects.select_related('task')
+    # return render(request, 'show_tasks.html', {'all_details':tasks_details})
+
+    """for one to many(foreign key relations)"""
+    # tasks = Task.objects.select_related('project')
+    # # select_related is not working for reverse_realtions in one to manay relations
+    # return render(request, 'show_tasks.html', {"tasks":tasks})
+
+    """ prefetch_related (reverse_foreignkey, manaytomany)"""
+    # projects = Project.objects.prefetch_related('tasks').all()
+    # return render(request, 'show_tasks.html', {'projects': projects})
+
+    tasks = Task.objects.prefetch_related('assigned_to')
+    return render(request, 'show_tasks.html', {'tasks': tasks})

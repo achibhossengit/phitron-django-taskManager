@@ -6,63 +6,55 @@
     <title>All tasks</title>
 </head>
 <body>
-    {% comment %} <section>
-        <div>
-            <h1>All of your tasks:</h1>
-            <ul>
-                {% for task in  tasks%}
-                    <li>{{task}}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div>
-            <h1>Pending tasks list:</h1>
-            <ul>
-                {% for task in pending_tasks %}
-                    <li> {{task.title}} </li>
-                    <span> {{task.status}} </span>
-                {% endfor %}
-            </ul>
-        </div>
-        <div>
-            <h1>List of Not Low tasks:</h1>
-            <ul>
-                {% for task in not_low_tasks %}
-                    <p> {{task.task}} </p>
-                    <span> {{task.priority}} </span>
-                {% endfor %}
-            </ul>
-        </div>
-        <div>
-            {{task2}}
-        </div>
-        <div>
-            {{first_task}}
-        </div>
-    </section> {% endcomment %}
-    {% comment %} <section>
-        <div>
-            <h1>Searching icontains with 'and' operaions</h1>
-            <ul>
-                {% for task in and_tasks %}
-                    <li>{{task.title}}</li>
-                    <span>{{task.status}}</span>
-                {% endfor %}
-            </ul>
-        </div>
-        <div>
-            <h1>Searching with 'or' operations</h1>
-            <ul>
-                {% for task in or_tasks %}
-                    <li>{{task.title}}</li>
-                    <span>{{task.status}}</span>
-                {% endfor %}
-            </ul>
-        </div>
-    </section> {% endcomment %}
+    {% comment %} <div>
+        <ul>
+            {% for task in tasks %}
+                <li>{{task.title}}</li>
+                <span> {{task.details.priority}} </span>
+            {% endfor %}
+        </ul>
+    </div> {% endcomment %}
+    {% comment %} <div>
+        <ul>
+            {% for detail in all_details %}
+                <li> {{detail.task.title}} </li>
+                <span> {{detail.priority}} </span>
+            {% endfor %}
+        </ul>
+    </div> {% endcomment %}
+    {% comment %} <div>
+        <ul>
+            {% for task in tasks %}
+                <li> {{task.title}} </li>
+                <span> {{task.project}} </span>
+            {% endfor %}
+        </ul>
+    </div> {% endcomment %}
 
-    <section>
-        <h2> {{is_exits}} </h2>
-    </section>
+    {% comment %} <div>
+        <ol>
+            {% for project in projects %}
+                <li>{{project.name}}</li>
+                <ol>
+                    {% for task in project.tasks.all%}
+                        <li>{{task.title}}</li>
+                    {% endfor %}
+                </ol>
+            {% endfor %}
+        </ol>
+    </div> {% endcomment %}
+
+    <div>
+        <ol>
+            {% for task in tasks %}
+                <li>{{task.title}}</li>
+                <ol>
+                    {% for emp in task.assigned_to.all%}
+                        <li>{{emp.name}}</li>
+                    {% endfor %}
+                </ol>
+            {% endfor %}
+        </ol>
+    </div>
 </body>
 </html>
