@@ -9,7 +9,22 @@ def dashboard(request):
     return render(request, "dashboard/dashboard-common.html")
 
 def manager_dashboard(request):
-    return render(request, "dashboard/manager-dashboard.html")
+    tasks = Task.objects.all()
+
+    # getting task count
+    total_task = tasks.count()
+    completed_task = Task.objects.filter(status='COMPLETED').count()
+    in_progress = Task.objects.filter(status = 'IN_PROGRESS').count()
+    pending_task = Task.objects.filter(status = 'PENDING').count()
+
+    context = {
+        'tasks': tasks,
+        'total_task': total_task,
+        'completed_task': completed_task,
+        'in_progress': in_progress,
+        'pending_task': pending_task
+    }
+    return render(request, "dashboard/manager-dashboard.html", context)
 
 def user_dashboard(request):
     return render(request, "dashboard/user-dashboard.html")
