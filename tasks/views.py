@@ -9,20 +9,20 @@ def dashboard(request):
     return render(request, "dashboard/dashboard-common.html")
 
 def manager_dashboard(request):
-    tasks = Task.objects.all()
+    tasks = Task.objects.select_related('details').prefetch_related('assigned_to').all()
 
     # getting task count
-    total_task = tasks.count()
-    completed_task = Task.objects.filter(status='COMPLETED').count()
-    in_progress = Task.objects.filter(status = 'IN_PROGRESS').count()
-    pending_task = Task.objects.filter(status = 'PENDING').count()
+    counts = Task.objects.aggregate(
+        total=Count('id'),
+        completed=Count('id', filter=Q(status='COMPLETED')),
+        in_progress=Count('id', filter=Q(status='IN_PROGRESS')),
+        pending=Count('id', filter=Q(status='PENDING'))
+        
+        )
 
     context = {
         'tasks': tasks,
-        'total_task': total_task,
-        'completed_task': completed_task,
-        'in_progress': in_progress,
-        'pending_task': pending_task
+        'counts': counts
     }
     return render(request, "dashboard/manager-dashboard.html", context)
 
