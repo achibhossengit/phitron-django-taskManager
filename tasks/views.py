@@ -9,8 +9,8 @@ def dashboard(request):
     return render(request, "dashboard/dashboard-common.html")
 
 def manager_dashboard(request):
-    tasks = Task.objects.select_related('details').prefetch_related('assigned_to').all()
-
+    type = request.GET.get('type', 'all')
+    
     # getting task count
     counts = Task.objects.aggregate(
         total=Count('id'),
@@ -19,6 +19,17 @@ def manager_dashboard(request):
         pending=Count('id', filter=Q(status='PENDING'))
         
         )
+    # Retriving task data
+    base_query = Task.objects.select_related('details').prefetch_related('assigned_to')
+    
+    if type == 'completed':
+        tasks = base_query.filter(status='COMPLETED')
+    if type == 'in_progress':
+        tasks = base_query.filter(status='IN_PROGRESS')
+    if type == 'pending':
+        tasks = base_query.filter(status='PENDING')
+    if type == 'all':
+        tasks = base_query.all()
 
     context = {
         'tasks': tasks,
