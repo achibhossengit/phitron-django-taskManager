@@ -1,5 +1,5 @@
 from django import forms
-from tasks.models import Task
+from tasks.models import Task, TaskDetail
 
 
 class TaskForm(forms.Form):
@@ -56,26 +56,6 @@ class TaskModelForm(StyledFormMixin, forms.ModelForm):
             'assigned_to': forms.CheckboxSelectMultiple
         }
 
-        # exclude = ["project", "is_completed"]
-
-        # """ Manual Widget """
-        # widgets = {
-        #     'title':forms.TextInput(attrs={
-        #         'class':'border-2 rounded-md w-full p-3 my-5',
-        #         'placeholder': 'Enter task title'
-        #     }),
-        #     'description':forms.Textarea(attrs={
-        #         'class':'border-2 rounded-md w-full p-3 my-5',
-        #         'placeholder': 'Define your task'
-        #     }),
-        #     'due_date': forms.SelectDateWidget(attrs={
-        #         'class':'border-2 rounded-md my-5'
-        #     }),
-        #     'assigned_to': forms.CheckboxSelectMultiple(attrs={
-        #         'class':'  my-5',
-        #     })
-        #     }
-
     """ Widget using Mixin """
 
     # MRO: TaskModelForm -> StyleFormMixin -> ModelForm
@@ -83,3 +63,12 @@ class TaskModelForm(StyledFormMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.apply_default_classes()
 
+class TaskDetialModelForm(StyledFormMixin, forms.ModelForm):
+    class Meta:
+        model = TaskDetail
+        fields = ['priority', 'notes']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_default_classes()
+    
