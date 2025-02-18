@@ -2,6 +2,13 @@
 {% block title %}Manager Dashboard{% endblock title %}
 
 {% block tasks %}
+<div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="font-bold text-center {% if message.tags == 'success' %}bg-green-500{% endif %} ">{{message}}</div>
+        {% endfor %}
+    {% endif %}
+</div>
 <section class="bg-white rounded-xl p-2 shadow-sm mt-10">
     <div class="grid grid-cols-4 gap-5">
         <h3 class="text-gray-500 text-xl">Task Title</h3>
@@ -13,6 +20,12 @@
             <div class="flex items-center gap-2">
                 <h1 class="h-2 w-2 bg-green-600 rounded-full"></h1>
                 <span> {{task.title}} </span>
+                <a href="{% url "update-task" task.id %}" class="p-2 bg-green-500">Edit</a>
+                <a href="{% url "delete-task" task.id %}" class="p-2 bg-red-300">Delete</a>
+                {% comment %} <form action="{% url "delete-task" task.id %}" method='POST'>
+                    {% csrf_token %}
+                    <button class="p-2 bg-red-300">Delete</button>
+                </form> {% endcomment %}
             </div>
             <div>
                 <span class="px-3 bg-blue-50 py-1 rounded-full text-sm text-blue-600"> {{task.details.get_priority_display}} </span>

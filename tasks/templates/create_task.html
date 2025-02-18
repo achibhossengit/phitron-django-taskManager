@@ -9,13 +9,13 @@
     <link rel="stylesheet" href="{% static "CSS/output.css" %}">
 </head>
 <body>
-    {% comment %} <h1 class="w-full text-red-700 p  my-5">Hello coder, i am here to solve your problem!</h1> {% endcomment %}
+    {% comment %} <h1 class="w-full text-red-700 p  my- a5">Hello coder, im here to solve your problem!</h1> {% endcomment %}
 
     <div class="w-1/2 mx-auto mb-3">
         <div>
             {% if messages %}
                 {% for message in messages %}
-                    <div class="p-5 font-bold size-5 {% if message.tags == 'success' %}bg-green-500{% endif %} ">{{message}}</div>
+                    <div class="font-bold text-center {% if message.tags == 'success' %}bg-green-500{% endif %} ">{{message}}</div>
                 {% endfor %}
             {% endif %}
         </div>

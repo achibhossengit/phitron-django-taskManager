@@ -71,6 +71,40 @@ def create_task(request):
         }
     return render(request, 'create_task.html', context)
 
+
+def update_task(request, id):
+    task = Task.objects.get(id=id)
+    task_form = TaskModelForm(instance=task)
+    task_detail_form = TaskDetialModelForm(instance = task.details)
+
+    if request.method == 'POST':
+        task_form = TaskModelForm(request.POST, instance=task)
+        task_detail_form = TaskDetialModelForm(request.POST, instance=task.details)
+        if task_form.is_valid() and task_detail_form.is_valid():
+            """ for Model form """
+            task = task_form.save()
+            task_detail = task_detail_form.save(commit=False)
+            task_detail.task = task
+            task_detail_form.save()
+
+            messages.success(request, "Task updated successfully!")
+            return redirect('update-task', id)
+    context = {
+        'task_form': task_form,
+        'task_detail_form': task_detail_form
+        }
+    return render(request, 'create_task.html', context)
+
+def delete_task(request, id):
+    if request.method == 'POST':
+        task = Task.objects.get(id=id)
+        task.delete()
+        messages.success(request, "Task deleted Successfully!")
+        return redirect('manager-dashboard')
+    else:
+        messages.error(request, 'Something went wrong!')
+        return redirect('manager-dashboard')
+
 def show_all_tasks(request):
     """ Data Retrive (django aggregations)"""
 
