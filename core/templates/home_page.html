@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home page</title>
+</head>
+<body>
+    <h1>Wellcome to Home Page</h1>
+
+    {% comment %} 
+    action সহ ফর্ম: নির্দিষ্ট URL-এ ডেটা পাঠায়।
+    action ছাড়া ফর্ম: ডেটা বর্তমান পেজে প্রসেস হয়।
+    render: টেমপ্লেট রেন্ডার করে।
+    redirect: নতুন URL-এ পুনঃনির্দেশ করে। 
+    {% endcomment %}
+    
+    <form action="{% url 'sign-out' %}" method='POST'>
+        {% csrf_token %}
+        <button type="submit">Sign out</button>
+    </form>
+</body>
+</html>
