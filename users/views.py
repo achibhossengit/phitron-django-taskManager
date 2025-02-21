@@ -2,9 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from users.forms import RegisterForm, CustomRegisterForm
+from users.forms import RegisterForm, CustomRegisterForm, CustomLoginForm
 from django.contrib import messages
-
 
 def sign_up(request):
     if request.method == 'GET':
@@ -26,8 +25,9 @@ def sign_up(request):
 
 
 def sign_in(request):
-    form = AuthenticationForm(data = request.POST)
+    form = CustomLoginForm()
     if request.method=='POST':
+        form = CustomLoginForm(data = request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)

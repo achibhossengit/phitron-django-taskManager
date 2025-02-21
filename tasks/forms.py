@@ -16,9 +16,9 @@ class TaskForm(forms.Form):
 """ Mixins """
 class StyledFormMixin:
     # MRO-> Method Resulation Order
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.apply_default_classes()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_default_classes()
 
     default_classes = 'border-2 rounded-md w-full p-3'
 
@@ -44,6 +44,10 @@ class StyledFormMixin:
                 field.widget.attrs.update({
                     'class': 'mb-3'
                 })
+            else:
+                field.widget.attrs.update({
+                    'class': self.default_classes
+                })
     
 class TaskModelForm(StyledFormMixin, forms.ModelForm):    
     class Meta:
@@ -56,19 +60,9 @@ class TaskModelForm(StyledFormMixin, forms.ModelForm):
             'assigned_to': forms.CheckboxSelectMultiple
         }
 
-    """ Widget using Mixin """
-
-    # MRO: TaskModelForm -> StyleFormMixin -> ModelForm
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.apply_default_classes()
 
 class TaskDetialModelForm(StyledFormMixin, forms.ModelForm):
     class Meta:
         model = TaskDetail
         fields = ['priority', 'notes']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.apply_default_classes()
     

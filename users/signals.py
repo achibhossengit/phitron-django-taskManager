@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 def confirmation_email_sent(sender, instance, created, **kwargs):
     if created:
         token = default_token_generator.make_token(instance)
-        activation_url = f"http://127.0.0.1:8000/user/{instance.id}/{token}"
+        activation_url = f"{settings.FRONTEND_URL}/users/activate/{instance.id}/{token}"
         recipient_list = [instance.email]
         subject = 'Activate your account'
         message = f"Hello {instance.username}, \n\nPlease click the link bellow to activate your employee your account.\n Activation Link: {activation_url}"

@@ -1,7 +1,8 @@
 from django import forms
 import re
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from tasks.forms import StyledFormMixin
 
 class RegisterForm(UserCreationForm):
     class Meta:
@@ -61,5 +62,8 @@ class CustomRegisterForm(forms.ModelForm):
             raise forms.ValidationError("This email address is already registered. Please try another.")
         
         return email
-        
-        
+    
+
+class CustomLoginForm(StyledFormMixin, AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
