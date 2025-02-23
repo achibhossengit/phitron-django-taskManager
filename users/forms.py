@@ -1,7 +1,7 @@
 from django import forms
 import re
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
 from tasks.forms import StyledFormMixin
 
 class RegisterForm(UserCreationForm):
@@ -69,8 +69,26 @@ class CustomLoginForm(StyledFormMixin, AuthenticationForm):
         super().__init__(*args, **kwargs)
 
 
-class AssignRoleForm(forms.Form):
+class AssignRoleForm(StyledFormMixin, forms.Form):
     role = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         empty_label="Choice a Role"
     )
+
+# class CreateGroupForm(StyledFormMixin, forms.ModelForm):
+#     class Meta:
+#         model = Group
+#         fields = '__all__'
+
+
+class CreateGroupForm(StyledFormMixin, forms.ModelForm):
+    # for customizations. basicially, its overright default widgets and attrs of permissions field of Group table
+    permissions = forms.ModelMultipleChoiceField(
+        queryset= Permission.objects.all(),
+        widget = forms.CheckboxSelectMultiple,
+        required = False,
+        label = 'Assign Permission'
+    )
+    class Meta:
+        model = Group
+        fields = ['name', 'permissions'] # main question is here.....
