@@ -84,4 +84,7 @@ def create_group(request):
             messages.success(request, f"{group.name} Group created successfully!")
             return redirect('create-group')
     return render(request, 'admin/create_group.html', {'form':form})
-        
+
+def group_list(request):
+    groups = Group.objects.all()
+    return render(request, 'admin/group_list.html', {'groups': groups})
