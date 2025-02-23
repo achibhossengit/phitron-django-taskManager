@@ -101,6 +101,13 @@
     </header>
 
     <main>
+        <section>
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="text-center bg-green-500 font-semibold">{{message}}</p>
+                {% endfor %}
+            {% endif %}
+        </section>
         {% block content %}
             {% include "admin/user_list.html" %}
         {% endblock content %}
