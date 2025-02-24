@@ -15,7 +15,16 @@
     redirect: নতুন URL-এ পুনঃনির্দেশ করে। 
     {% endcomment %}
     
-    <form action="{% url 'sign-out' %}" method='POST'>
+    {% comment %} Process in fontend {% endcomment %}
+    {% comment %} <form action="{% url 'sign-out' %}" method='POST'>
+        {% csrf_token %}
+        <button type="submit">Sign out</button>
+    </form> {% endcomment %}
+    
+    <div>
+        {{user.username}}
+    </div>
+    <form method='POST'>
         {% csrf_token %}
         <button type="submit">Sign out</button>
     </form>
