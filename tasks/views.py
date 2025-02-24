@@ -4,11 +4,18 @@ from tasks.models import  Task, Employee, TaskDetail, Project
 from django.http import HttpResponse
 from django.db.models import Q, Count, Max, Min, Avg
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 
-# Create your views here.
-def dashboard(request):
-    return render(request, "dashboard/dashboard-common.html")
+# checking function
+def is_manager(user):
+    return user.groups.filter(name='Manager').exists()
 
+def is_employee(user):
+    return user.groups.filter(name='Employee').exists()
+
+
+# All views
+@user_passes_test(is_manager, login_url='no-permission')
 def manager_dashboard(request):
     type = request.GET.get('type', 'all')
     
@@ -38,7 +45,8 @@ def manager_dashboard(request):
     }
     return render(request, "dashboard/manager-dashboard.html", context)
 
-def user_dashboard(request):
+@user_passes_test(is_employee, login_url='no-permission')
+def employee_dashboard(request):
     return render(request, "dashboard/user-dashboard.html")
 
 def test_file(request):
@@ -49,6 +57,8 @@ def test_file(request):
     return render(request, 'test.html', context)
 
 
+@login_required(login_url='sign-in')
+@permission_required(perm='tasks.add_task' ,login_url='no-permission')
 def create_task(request):
     # employees = Employee.objects.all()
     task_form = TaskModelForm()
@@ -71,7 +81,8 @@ def create_task(request):
         }
     return render(request, 'create_task.html', context)
 
-
+@login_required()
+@permission_required(perm='tasks.change_task', login_url='no-permission')
 def update_task(request, id):
     task = Task.objects.get(id=id)
     task_form = TaskModelForm(instance=task)
@@ -95,6 +106,8 @@ def update_task(request, id):
         }
     return render(request, 'create_task.html', context)
 
+@login_required()
+@permission_required(perm='tasks.delete_task', login_url='no-permission')
 def delete_task(request, id):
     if request.method == 'POST':
         task = Task.objects.get(id=id)
@@ -105,9 +118,10 @@ def delete_task(request, id):
         messages.error(request, 'Something went wrong!')
         return redirect('manager-dashboard')
 
+@login_required()
+@permission_required(perm='tasks.view_task', login_url='no-permission')
 def show_all_tasks(request):
     """ Data Retrive (django aggregations)"""
-
     tasks = Task.objects.aggregate(net_task= Count('id'))
     projects = Project.objects.annotate(net_task=Count('tasks')).order_by('net_task')
     return render(request, 'show_tasks.html', {'tasks':tasks, 'projects':projects})
