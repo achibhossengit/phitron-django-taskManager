@@ -17,7 +17,9 @@
                             <td class="border border-gray-300 px-4 py-2">
                                 <ul class="list-disc list-inside">
                                     {% for permission in group.permissions.all %}
-                                        <li>{{permission}}|{{permission.codename}}</li>
+                                        <li>{{permission.name}} | {{permission.codename}}</li>
+                                        {% comment %} it will run 60 similer quires {% endcomment %}
+                                        {% comment %} <li>{{permission}}</li> {% endcomment %}
                                     {% empty %}
                                         <span>No permisson Granted</span>
                                     {% endfor %}
