@@ -125,3 +125,9 @@ def show_all_tasks(request):
     tasks = Task.objects.aggregate(net_task= Count('id'))
     projects = Project.objects.annotate(net_task=Count('tasks')).order_by('net_task')
     return render(request, 'show_tasks.html', {'tasks':tasks, 'projects':projects})
+
+@login_required()
+@permission_required(perm='tasks.view_task', login_url='no-permission')
+def show_task_details(request, task_id):
+    task = Task.objects.get(id=task_id)
+    return render(request, 'task_details.html', {'task': task})
