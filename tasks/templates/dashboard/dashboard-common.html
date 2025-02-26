@@ -1,43 +1,6 @@
-{% load static %}
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock title %}</title>
-    {% comment %} <script src="https://cdn.tailwindcss.com"></script> {% endcomment %}
-    <link rel="stylesheet" href='{% static "css/output.css" %}'>
-    {% comment %} font family {% endcomment %}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-        rel="stylesheet">
-    {% comment %} css {% endcomment %}
-    <style>
-        body{
-            font-family: Intet, sans-serif;
-        }
-    </style>
-</head>
-
-<body class="max-w-[1400px] mx-auto bg-gray-50">
-    <header class="flex justify-between text-2xl font-semibold mt-5">
-        <h1>Dashboard</h1>
-        <div class="flex items-center gap-4">
-            <button class="p-2 rounded-full hover:bg-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                </svg>
-            </button>
-            <button class="w-10 h-10 flex justify-center items-center rounded-full bg-blue-500 text-white">B</button>
-        </div>
-    </header>
-    <main>
+{% extends "base.html" %}
+{% block content %}
+    <div class="w-[1470px] mx-auto mb-20">
         <section class="lg:flex lg:justify-between mt-10 text-gray-500 font-semibold">
             <a href="{% url 'manager-dashboard' %}?type=all">
                 <div class="flex items-center gap-20 bg-white rounded-xl p-5 shadow-sm">
@@ -112,12 +75,9 @@
                 </div>
             </a>
         </section>
-
+    
         {% block tasks %}
         
         {% endblock tasks %}
-    </main>
-    {% include "footer.html" %}
-</body>
-
-</html>
+    </div>
+{% endblock content %}

@@ -40,7 +40,7 @@ def sign_in(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return render(request, 'home_page.html', {'user': user})
+            return redirect('home')
 
     return render(request, 'register/sign_in.html', {'form': form}) # for get request
 
@@ -50,9 +50,9 @@ def sign_out(request):
     if request.method == 'POST':
         logout(request)
         # return render(request, 'register/sign_in.html') #render: টেমপ্লেট রেন্ডার করে in old url।
-        return redirect('sign-in') # redirect: নতুন URL-এ পুনঃনির্দেশ করে।
+        return redirect('home') # redirect: নতুন URL-এ পুনঃনির্দেশ করে।
     else:
-        return render(request, 'home_page.html')
+        return render(request, 'home.html')
     
 def active_user(request, user_id, token):
     try:

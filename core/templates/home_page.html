@@ -22,7 +22,7 @@
     </form> {% endcomment %}
     
     <div>
-        {{user.username}}
+        {{request.user.username}}
     </div>
     <form method='POST'>
         {% csrf_token %}

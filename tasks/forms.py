@@ -20,14 +20,14 @@ class StyledFormMixin:
         super().__init__(*args, **kwargs)
         self.apply_default_classes()
 
-    default_classes = 'border-2 rounded-md w-full p-3'
+    default_classes = 'border-2 focus:outline-none focus:border-blue-500 border-gray-200 focus:border-blue-500 rounded-md w-full p-3'
 
     def apply_default_classes(self):
         for field_name, field in self.fields.items():
-            if isinstance(field.widget, forms.TextInput):
+            if isinstance(field.widget, forms.TextInput) or isinstance(field.widget, forms.EmailInput):
                 field.widget.attrs.update({
                     'class': self.default_classes,
-                    'placeholder': f'Enter {field.label.lower()}'
+                    'placeholder': f'Enter {field.label}'
                 })
             elif isinstance(field.widget, forms.Textarea):
                 field.widget.attrs.update({

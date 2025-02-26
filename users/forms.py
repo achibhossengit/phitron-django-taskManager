@@ -14,7 +14,7 @@ class RegisterForm(UserCreationForm):
         for field_name in ['username', 'password1', 'password2']:
             self.fields[field_name].help_text = None
 # custom model form 
-class CustomRegisterForm(forms.ModelForm):
+class CustomRegisterForm(StyledFormMixin, forms.ModelForm):
     password = forms.CharField()
     confirm_password = forms.CharField()
     class Meta:

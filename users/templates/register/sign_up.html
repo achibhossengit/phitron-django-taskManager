@@ -1,25 +1,10 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% comment %} <link rel="stylesheet" href="{% static 'css/output.css' %}"> {% endcomment %}
-    <title>Sign Up</title>
-</head>
-<body>
-    <div>
-        {% if messages %}
-            {% for message in messages %}
-                {{message}}
-            {% endfor %}
-        {% endif %}
+{% extends "base.html" %}
+{% block content %}
+    <div class="my-20 w-1/2 mx-auto">
+        <form action="" method='POST'>
+            {% csrf_token %}
+            {{form.as_p}}
+            <button type="submit" class="hidden md:block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300 mt-3">Sign Up</button>
+        </form>
     </div>
-    <h1>Hello welcome to sign up page</h1>
-    <form action="" method='POST'>
-        {% csrf_token %}
-        {{form.as_p}}
-        <button type="submit">Submit</button>
-    </form>
-</body>
-</html>
+{% endblock content %}

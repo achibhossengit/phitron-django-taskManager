@@ -6,7 +6,7 @@ def home(request):
     if request.method == 'POST':
         logout(request)
         return redirect('sign-in')
-    return render(request, 'home_page.html')
+    return render(request, 'home.html')
 
 def no_permission(request):
     return render(request, 'no_permission.html')
