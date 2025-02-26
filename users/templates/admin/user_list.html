@@ -43,7 +43,9 @@
                     <td class="px-4 py-4 whitespace-nowrap">{{user.first_name}} {{user.last_name}}</td>
                     <td class="px-4 py-4 whitespace-nowrap">{{user.email}}</td>
                     <td class="px-4 py-4 whitespace-nowrap">{{user.id}}</td>
-                    <td class="px-4 py-4 whitespace-nowrap">{{user.groups.first.name|default:"No Group assigned"}}</td>
+                    {% comment %} here, .first run some similer queries. so, we handle it from views {% endcomment %}
+                    {% comment %} <td class="px-4 py-4 whitespace-nowrap">{{user.groups.first.name|default:"No Group assigned"}}</td> {% endcomment %}
+                    <td class="px-4 py-4 whitespace-nowrap">{{user.group_name}}</td>
                     <td class="px-4 py-4 whitespace-nowrap">
                     <a
                         href="{% url 'assign-role' user.id %}"
