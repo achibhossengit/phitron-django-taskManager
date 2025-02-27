@@ -106,7 +106,9 @@
                     <h2 class="text-xl font-bold mb-4">ASSETS</h2>
                     <div class="space-y-4">
                         <img
-                            src="/placeholder.svg?height=200&width=300"
+                            {% if task.details.asset %}
+                                src={{task.details.asset.url}}
+                            {% endif %}
                             alt="Task Manager App Screenshot 1"
                             class="w-full rounded-lg"
                         />
