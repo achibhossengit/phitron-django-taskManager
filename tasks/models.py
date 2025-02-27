@@ -1,14 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Employee(models.Model):
-    name = models.CharField(max_length=50)
-    email = models.EmailField(unique=True)
-    # task_set: reverse relations-> tasks: its changed by related_name
-    """ Dunder method: object-> string , it for model form"""
-    def __str__(self):
-        return self.name
-
 class Task(models.Model):
     STATUS_OPTIONS = (
         ("PENDING", 'Pending'),

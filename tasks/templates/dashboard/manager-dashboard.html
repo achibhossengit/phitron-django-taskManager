@@ -33,7 +33,7 @@
             <div class="flex -space-x-2">
                 {% for employee in task.assigned_to.all %}
                     <div class="w-8 h-8 rounded-full text-white bg-blue-500 flex justify-center items-center text-sm border-2 border-white">
-                        {{employee.name|slice:':2'}}
+                        {{employee.first_name|slice:':2'}}
                     </div>
                 {% endfor %}
             </div>

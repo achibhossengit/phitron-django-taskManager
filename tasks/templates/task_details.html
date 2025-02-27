@@ -72,11 +72,11 @@
                                 <div
                                     class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white"
                                 >
-                                    {{ employee.name|slice:':2'|upper }}
+                                    {{ employee.first_name|slice:':2'|upper }}
                                 </div>
                                 <div>
-                                    <div class="font-semibold">{{ employee.name }}</div>
-                                    <div class="text-gray-600">Administrator</div>
+                                    <div class="font-semibold">{{ employee.first_name }}</div>
+                                    <div class="text-gray-600">{{employee.groups.first.name}}</div>
                                 </div>
                             </div>
                             {% endfor %}
