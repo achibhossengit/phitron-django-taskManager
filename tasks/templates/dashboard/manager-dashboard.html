@@ -20,8 +20,6 @@
             <div class="flex items-center gap-2">
                 <h1 class="h-2 w-2 bg-green-600 rounded-full"></h1>
                 <a href="{% url 'task-details' task.id %}">{{task.title}}</a>
-                <a href="{% url "update-task" task.id %}" class="p-2 bg-green-500">Edit</a>
-                <a href="{% url "delete-task" task.id %}" class="p-2 bg-red-300">Delete</a>
                 {% comment %} <form action="{% url "delete-task" task.id %}" method='POST'>
                     {% csrf_token %}
                     <button class="p-2 bg-red-300">Delete</button>
