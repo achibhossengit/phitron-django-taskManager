@@ -74,7 +74,7 @@ def create_task(request):
             task_detail_form.save()
 
             messages.success(request, "Task added successfully!")
-            return redirect('create-task')
+            return redirect('manager-dashboard')
     context = {
         'task_form': task_form,
         'task_detail_form': task_detail_form
@@ -86,11 +86,11 @@ def create_task(request):
 def update_task(request, id):
     task = Task.objects.get(id=id)
     task_form = TaskModelForm(instance=task)
-    task_detail_form = TaskDetialModelForm(instance = task.details)
+    task_detail_form = TaskDetialModelForm( instance = task.details)
 
     if request.method == 'POST':
         task_form = TaskModelForm(request.POST, instance=task)
-        task_detail_form = TaskDetialModelForm(request.POST, instance=task.details)
+        task_detail_form = TaskDetialModelForm(request.POST, request.FILES, instance=task.details)
         if task_form.is_valid() and task_detail_form.is_valid():
             """ for Model form """
             task = task_form.save()
@@ -99,7 +99,7 @@ def update_task(request, id):
             task_detail_form.save()
 
             messages.success(request, "Task updated successfully!")
-            return redirect('update-task', id)
+            return redirect('task-details', id)
     context = {
         'task_form': task_form,
         'task_detail_form': task_detail_form
@@ -109,14 +109,12 @@ def update_task(request, id):
 @login_required()
 @permission_required(perm='tasks.delete_task', login_url='no-permission')
 def delete_task(request, id):
-    if request.method == 'POST':
+    if request.method == 'GET':
         task = Task.objects.get(id=id)
         task.delete()
         messages.success(request, "Task deleted Successfully!")
         return redirect('manager-dashboard')
-    else:
-        messages.error(request, 'Something went wrong!')
-        return redirect('manager-dashboard')
+    
 
 @login_required()
 @permission_required(perm='tasks.view_task', login_url='no-permission')
@@ -128,6 +126,13 @@ def show_all_tasks(request):
 
 @login_required()
 @permission_required(perm='tasks.view_task', login_url='no-permission')
-def show_task_details(request, task_id):
+def task_details(request, task_id):
     task = Task.objects.get(id=task_id)
-    return render(request, 'task_details.html', {'task': task})
+    status_options = Task.STATUS_OPTIONS
+    if request.method == 'POST':
+        selected_status = request.POST.get('task_status')
+        task.status = selected_status
+        task.save()
+        redirect('task-details', task.id)
+
+    return render(request, 'task_details.html', {'task': task, 'status_options': status_options})
