@@ -5,6 +5,18 @@ from django.http import HttpResponse
 from django.db.models import Q, Count, Max, Min, Avg
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
+from django.views import View
+from django.utils.decorators import method_decorator
+
+# class based view
+class Greatings(View):
+    greatings = 'Hello everybody'
+    def get(self, request):
+        return HttpResponse(self.greatings)
+
+class HiGreatings(Greatings):
+    greatings = 'Hi everyone'
+
 
 # checking function
 def is_manager(user):
@@ -80,6 +92,34 @@ def create_task(request):
         'task_detail_form': task_detail_form
         }
     return render(request, 'create_task.html', context)
+
+# decorators varibale (it should be placed in top of all views)
+decorators = [login_required(), permission_required('tasks.add_task', 'no-permission')]
+
+# @method_decorator(login_required(), name='dispatch')
+# @method_decorator(decorators, name='dispatch')
+class CreateTask(View):
+    def get(self, request, *args, **kwargs):
+        task_form = TaskModelForm()
+        task_detail_form = TaskDetialModelForm()
+        context = {
+        'task_form': task_form,
+        'task_detail_form': task_detail_form
+        }
+        return render(request, 'create_task.html', context)
+
+    def post(self, request, *args, **kwargs):
+        task_form = TaskModelForm(request.POST)
+        task_detail_form = TaskDetialModelForm(request.POST, request.FILES)
+        if task_form.is_valid() and task_detail_form.is_valid():
+            """ for Model form """
+            task = task_form.save()
+            task_detail = task_detail_form.save(commit=False)
+            task_detail.task = task
+            task_detail_form.save()
+
+            messages.success(request, "Task added successfully!")
+            return redirect('create-task')
 
 @login_required()
 @permission_required(perm='tasks.change_task', login_url='no-permission')

@@ -22,7 +22,7 @@ def sign_up(request):
         form = CustomRegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            print('user:', user)
+            # print('user:', user)
             user.set_password(form.cleaned_data.get('password')) # for hasing
             user.is_active = False
             user.save()
