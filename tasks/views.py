@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.views import View
 from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 # class based view
 class Greatings(View):
@@ -98,7 +99,10 @@ decorators = [login_required(), permission_required('tasks.add_task', 'no-permis
 
 # @method_decorator(login_required(), name='dispatch')
 # @method_decorator(decorators, name='dispatch')
-class CreateTask(View):
+class CreateTask(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = 'no-permisssion' # by default log-in
+    permission_required = 'tasks.add_task'
+    
     def get(self, request, *args, **kwargs):
         task_form = TaskModelForm()
         task_detail_form = TaskDetialModelForm()
