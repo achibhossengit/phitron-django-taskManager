@@ -1,5 +1,5 @@
 from django import forms
-from tasks.models import Task, TaskDetail
+from tasks.models import Task, TaskDetail, Project
 
 
 class TaskForm(forms.Form):
@@ -66,3 +66,8 @@ class TaskDetialModelForm(StyledFormMixin, forms.ModelForm):
         model = TaskDetail
         fields = ['priority', 'notes','asset']
     
+
+class ProjectModelForm(StyledFormMixin, forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = "__all__"

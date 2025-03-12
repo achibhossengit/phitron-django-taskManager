@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from tasks.forms import TaskForm, TaskModelForm, TaskDetialModelForm
+from tasks.forms import TaskForm, TaskModelForm, TaskDetialModelForm, ProjectModelForm
 from tasks.models import  Task, Project
 from django.http import HttpResponse
 from django.db.models import Q, Count, Max, Min, Avg
@@ -180,3 +180,16 @@ def task_details(request, task_id):
         redirect('task-details', task.id)
 
     return render(request, 'task_details.html', {'task': task, 'status_options': status_options})
+
+
+
+def create_project(request):
+    project_form = ProjectModelForm()
+    if request.method == 'POST':
+        project_form = ProjectModelForm(request.POST)
+        if project_form.is_valid():
+            project_form.save()
+            print('projcet creation done')
+        else:
+            print('validations failed')
+    return render(request, 'create_task.html', {'project_form':project_form})

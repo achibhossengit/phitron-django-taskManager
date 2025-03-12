@@ -11,13 +11,23 @@
 <body>
     {% comment %} <h1 class="w-full text-red-700 p  my- a5">Hello coder, im here to solve your problem!</h1> {% endcomment %}
 
-    <div class="w-1/2 mx-auto mb-3">
+    {% if task_form %}
+        <div class="w-1/2 mx-auto mb-3">
         <form method="POST" enctype='multipart/form-data'>
             {% csrf_token %}
             {{task_form.as_p}}
             {{task_detail_form.as_p}}
             <button class="py-2 px-3 bg-red-300 border-none rounded-md" type="submit">Submit</button>
         </form>
-    </div>
+        </div>
+    {% elif project_form %}
+        <div class="w-1/2 mx-auto mb-3">
+        <form method="POST" enctype='multipart/form-data'>
+            {% csrf_token %}
+            {{project_form.as_p}}
+            <button class="py-2 px-3 bg-red-300 border-none rounded-md" type="submit">Submit</button>
+        </form>
+        </div>
+    {% endif %}
 </body>
 </html>
