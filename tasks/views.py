@@ -9,16 +9,7 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic.base import ContextMixin
-from django.views.generic import ListView, DetailView
-
-# class based view
-class Greatings(View):
-    greatings = 'Hello everybody'
-    def get(self, request):
-        return HttpResponse(self.greatings)
-
-class HiGreatings(Greatings):
-    greatings = 'Hi everyone'
+from django.views.generic import ListView, DetailView, UpdateView
 
 
 # checking function
@@ -30,7 +21,7 @@ def is_employee(user):
 
 
 # All views
-@user_passes_test(is_manager, login_url='no-permission')
+# @user_passes_test(is_manager, login_url='no-permission')
 def manager_dashboard(request):
     type = request.GET.get('type', 'all')
     
@@ -154,27 +145,34 @@ def update_task(request, id):
         'task_detail_form': task_detail_form
         }
     return render(request, 'create_task.html', context)
+        
 
-class UpdateTask(View):
-
-    def get(self, request, id, *args, **kwargs):
-        task = Task.objects.get(id=id)
-        task_form = TaskModelForm(instance = task)
-        task_detail_form = TaskDetialModelForm(instance = task.details)
-        return render(request, 'create_task.html', {'task_form':task_form, 'task_detail_form':task_detail_form})
+class UpdateTask(UpdateView):
+    model = Task
+    form_class = TaskModelForm # if none: its make a form of provided model
+    template_name = 'create_task.html'
+    context_object_name = 'task' # create a object of 'Task' and passed it as a context using 'task'(bydefault) 
+    pk_url_kwarg = 'id'
     
-    def post(self, request, id, *args, **kwargs):
-        task = Task.objects.get(id=id)
+    # this view bydefault taken one view. but we need an another view to update taskdetail also
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['task_form'] = self.get_form() # by default UpdateView pass form in context with using "form" named
+        context['task_detail_form'] = TaskDetialModelForm(instance = self.get_object().details)
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        task = self.get_object()
         task_form = TaskModelForm(request.POST, instance=task)
-        task_detail_form = TaskDetialModelForm(request.POST, request.FILES, instance=task)
+        task_detail_form = TaskDetialModelForm(request.POST, request.FILES, instance=getattr(task, 'details', None))
         if task_form.is_valid() and task_detail_form.is_valid():
             task_form.save()
             task_detail_form.save()
-            # messages.success(request, 'Task updated successfully!')
-            return HttpResponse("task updated successfylly!")
+            messages.success(request, "Task updated successfully")
+            return redirect('manager-dashboard')
         else:
-            return HttpResponse("form is not valid")
-
+            return redirect('update-task', self.object.id)
+    
 
         
 
@@ -211,12 +209,13 @@ class TaskDetail(DetailView):
         context['status_options'] = Task.STATUS_OPTIONS
         return context
     
-    def post(self, *args, **kwargs):
+    def post(self, request ,*args, **kwargs):
         task = self.get_object()
-        selected_status = self.get('task_status')
+        selected_status = request.POST.get('task_status')
+        print(selected_status)
         task.status = selected_status
         task.save()
-        redirect('task-details', task.id)
+        return redirect('task-details', task.id)
 
     
 

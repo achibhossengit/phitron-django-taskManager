@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth.decorators import login_required
 # from .views import show_task
-from tasks.views import manager_dashboard, employee_dashboard, create_task, show_projects, update_task, delete_task, task_details, Greatings, HiGreatings, CreateTask, create_project, UpdateTask, ShowProjects, TaskDetail
+from tasks.views import manager_dashboard, employee_dashboard, create_task, show_projects, update_task, delete_task, task_details, CreateTask, create_project, UpdateTask, ShowProjects, TaskDetail
 urlpatterns = [
     path('manager-dashboard/', manager_dashboard, name='manager-dashboard'),
     path('employee-dashboard/', employee_dashboard),
@@ -12,9 +12,7 @@ urlpatterns = [
     path('show-projects/', ShowProjects.as_view(), name='show-projects'),
     # path('task/<task_id>/details', task_details, name='task-details'),
     path('task/<task_id>/details', TaskDetail.as_view(), name='task-details'),
-    path('update-task/<int:id>/', update_task, name='update-task'),
-    # path('update-task/<int:id>/', UpdateTask.as_view(), name='update-task'),
+    # path('update-task/<int:id>/', update_task, name='update-task'),
+    path('update-task/<int:id>/', UpdateTask.as_view(), name='update-task'),
     path('delete/-task/<int:id>', delete_task, name='delete-task'),
-
-    path('greatings', HiGreatings.as_view(greatings = 'How are you today?'), name='greatings')
 ]
