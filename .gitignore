@@ -1,4 +1,5 @@
-task_env/
+task_env_lp/
+task_env_dx/
 __pycache__/
 db.sqlite3
 node_modules/

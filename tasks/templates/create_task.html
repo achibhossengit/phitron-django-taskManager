@@ -9,7 +9,11 @@
     <link rel="stylesheet" href="{% static "css/output.css" %}">
 </head>
 <body>
-    {% comment %} <h1 class="w-full text-red-700 p  my- a5">Hello coder, im here to solve your problem!</h1> {% endcomment %}
+    {% if messages %}
+        {% for message in messages %}
+            <p class="text-center">{{message}}</p>
+        {% endfor %}
+    {% endif %}
 
     {% if task_form %}
         <div class="w-1/2 mx-auto mb-3">

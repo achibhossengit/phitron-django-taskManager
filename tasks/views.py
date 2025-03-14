@@ -8,6 +8,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test, per
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views.generic.base import ContextMixin
+from django.views.generic import ListView, DetailView
 
 # class based view
 class Greatings(View):
@@ -99,17 +101,19 @@ decorators = [login_required(), permission_required('tasks.add_task', 'no-permis
 
 # @method_decorator(login_required(), name='dispatch')
 # @method_decorator(decorators, name='dispatch')
-class CreateTask(LoginRequiredMixin, PermissionRequiredMixin, View):
-    login_url = 'no-permisssion' # by default log-in
+class CreateTask(LoginRequiredMixin, PermissionRequiredMixin, ContextMixin, View):
+    # login_url for loginrequiredmixin is by default 'login page'
+    # login_url = 'no-permission'
     permission_required = 'tasks.add_task'
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['task_form'] = TaskModelForm()
+        context['task_detail_form'] = TaskDetialModelForm()
+        return context
+
     def get(self, request, *args, **kwargs):
-        task_form = TaskModelForm()
-        task_detail_form = TaskDetialModelForm()
-        context = {
-        'task_form': task_form,
-        'task_detail_form': task_detail_form
-        }
+        context = self.get_context_data()
         return render(request, 'create_task.html', context)
 
     def post(self, request, *args, **kwargs):
@@ -123,7 +127,8 @@ class CreateTask(LoginRequiredMixin, PermissionRequiredMixin, View):
             task_detail_form.save()
 
             messages.success(request, "Task added successfully!")
-            return redirect('create-task')
+            context =  self.get_context_data()
+            return render(request, 'create_task.html', context)
 
 @login_required()
 @permission_required(perm='tasks.change_task', login_url='no-permission')
@@ -150,6 +155,29 @@ def update_task(request, id):
         }
     return render(request, 'create_task.html', context)
 
+class UpdateTask(View):
+
+    def get(self, request, id, *args, **kwargs):
+        task = Task.objects.get(id=id)
+        task_form = TaskModelForm(instance = task)
+        task_detail_form = TaskDetialModelForm(instance = task.details)
+        return render(request, 'create_task.html', {'task_form':task_form, 'task_detail_form':task_detail_form})
+    
+    def post(self, request, id, *args, **kwargs):
+        task = Task.objects.get(id=id)
+        task_form = TaskModelForm(request.POST, instance=task)
+        task_detail_form = TaskDetialModelForm(request.POST, request.FILES, instance=task)
+        if task_form.is_valid() and task_detail_form.is_valid():
+            task_form.save()
+            task_detail_form.save()
+            # messages.success(request, 'Task updated successfully!')
+            return HttpResponse("task updated successfylly!")
+        else:
+            return HttpResponse("form is not valid")
+
+
+        
+
 @login_required()
 @permission_required(perm='tasks.delete_task', login_url='no-permission')
 def delete_task(request, id):
@@ -159,15 +187,6 @@ def delete_task(request, id):
         messages.success(request, "Task deleted Successfully!")
         return redirect('manager-dashboard')
     
-
-@login_required()
-@permission_required(perm='tasks.view_task', login_url='no-permission')
-def show_all_tasks(request):
-    """ Data Retrive (django aggregations)"""
-    tasks = Task.objects.aggregate(net_task= Count('id'))
-    projects = Project.objects.annotate(net_task=Count('tasks')).order_by('net_task')
-    return render(request, 'show_tasks.html', {'tasks':tasks, 'projects':projects})
-
 @login_required()
 @permission_required(perm='tasks.view_task', login_url='no-permission')
 def task_details(request, task_id):
@@ -181,7 +200,25 @@ def task_details(request, task_id):
 
     return render(request, 'task_details.html', {'task': task, 'status_options': status_options})
 
+class TaskDetail(DetailView):
+    model = Task
+    template_name = 'task_details.html'
+    context_object_name = 'task'
+    pk_url_kwarg = 'task_id'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status_options'] = Task.STATUS_OPTIONS
+        return context
+    
+    def post(self, *args, **kwargs):
+        task = self.get_object()
+        selected_status = self.get('task_status')
+        task.status = selected_status
+        task.save()
+        redirect('task-details', task.id)
+
+    
 
 def create_project(request):
     project_form = ProjectModelForm()
@@ -193,3 +230,21 @@ def create_project(request):
         else:
             print('validations failed')
     return render(request, 'create_task.html', {'project_form':project_form})
+
+
+@login_required()
+@permission_required(perm='tasks.view_task', login_url='no-permission')
+def show_projects(request):
+    tasks = Task.objects.aggregate(net_task= Count('id'))
+    """ Data Retrive (django aggregations)"""
+    projects = Project.objects.annotate(net_task=Count('tasks')).order_by('net_task')
+    return render(request, 'show_projects.html', {'tasks':tasks, 'projects': projects})
+
+class ShowProjects(ListView):
+    model = Project
+    context_object_name = 'projects'
+    template_name = 'show_projects.html'
+
+    def get_queryset(self):
+        queryset = Project.objects.annotate(net_task=Count('tasks')).order_by('net_task')
+        return queryset
