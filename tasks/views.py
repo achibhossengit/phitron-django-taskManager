@@ -12,57 +12,6 @@ from django.views.generic.base import ContextMixin
 from django.views.generic import ListView, DetailView, UpdateView
 
 
-# checking function
-def is_manager(user):
-    return user.groups.filter(name='Manager').exists()
-
-def is_employee(user):
-    return user.groups.filter(name='Employee').exists()
-
-
-# All views
-# @user_passes_test(is_manager, login_url='no-permission')
-def manager_dashboard(request):
-    type = request.GET.get('type', 'all')
-    
-    # getting task count
-    counts = Task.objects.aggregate(
-        total=Count('id'),
-        completed=Count('id', filter=Q(status='COMPLETED')),
-        in_progress=Count('id', filter=Q(status='IN_PROGRESS')),
-        pending=Count('id', filter=Q(status='PENDING'))
-        
-        )
-    # Retriving task data
-    base_query = Task.objects.select_related('details').prefetch_related('assigned_to')
-    
-    if type == 'completed':
-        tasks = base_query.filter(status='COMPLETED')
-    if type == 'in_progress':
-        tasks = base_query.filter(status='IN_PROGRESS')
-    if type == 'pending':
-        tasks = base_query.filter(status='PENDING')
-    if type == 'all':
-        tasks = base_query.all()
-
-    context = {
-        'tasks': tasks,
-        'counts': counts
-    }
-    return render(request, "dashboard/manager-dashboard.html", context)
-
-@user_passes_test(is_employee, login_url='no-permission')
-def employee_dashboard(request):
-    return render(request, "dashboard/user-dashboard.html")
-
-def test_file(request):
-    context = {
-        "names": ['Al Mahmud', 'Appolo', 'Taniya', 'Sweety'],
-        "age": 23
-    }
-    return render(request, 'test.html', context)
-
-
 @login_required(login_url='sign-in')
 @permission_required(perm='tasks.add_task' ,login_url='no-permission')
 def create_task(request):
@@ -85,7 +34,7 @@ def create_task(request):
         'task_form': task_form,
         'task_detail_form': task_detail_form
         }
-    return render(request, 'create_task.html', context)
+    return render(request, 'form.html', context)
 
 # decorators varibale (it should be placed in top of all views)
 decorators = [login_required(), permission_required('tasks.add_task', 'no-permission')]
@@ -105,7 +54,7 @@ class CreateTask(LoginRequiredMixin, PermissionRequiredMixin, ContextMixin, View
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data()
-        return render(request, 'create_task.html', context)
+        return render(request, 'form.html', context)
 
     def post(self, request, *args, **kwargs):
         task_form = TaskModelForm(request.POST)
@@ -119,7 +68,7 @@ class CreateTask(LoginRequiredMixin, PermissionRequiredMixin, ContextMixin, View
 
             messages.success(request, "Task added successfully!")
             context =  self.get_context_data()
-            return render(request, 'create_task.html', context)
+            return render(request, 'form.html', context)
 
 @login_required()
 @permission_required(perm='tasks.change_task', login_url='no-permission')
@@ -144,13 +93,13 @@ def update_task(request, id):
         'task_form': task_form,
         'task_detail_form': task_detail_form
         }
-    return render(request, 'create_task.html', context)
+    return render(request, 'form.html', context)
         
 
 class UpdateTask(UpdateView):
     model = Task
     form_class = TaskModelForm # if none: its make a form of provided model
-    template_name = 'create_task.html'
+    template_name = 'form.html'
     context_object_name = 'task' # create a object of 'Task' and passed it as a context using 'task'(bydefault) 
     pk_url_kwarg = 'id'
     
@@ -228,7 +177,7 @@ def create_project(request):
             print('projcet creation done')
         else:
             print('validations failed')
-    return render(request, 'create_task.html', {'project_form':project_form})
+    return render(request, 'form.html', {'project_form':project_form})
 
 
 @login_required()
