@@ -9,6 +9,9 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Prefetch
 from tasks.models import Task
 from django.db.models import Q, Count
+from django.contrib.auth.views import LoginView
+from django.views.generic import TemplateView
+
 
 # checking function
 def is_admin(user):
@@ -100,6 +103,8 @@ def sign_in(request):
 
     return render(request, 'register/sign_in.html', {'form': form}) # for get request
 
+class CustomLoginView(LoginView):
+    form_class = CustomLoginForm
 
 @login_required(login_url='sign-in')
 def sign_out(request):
@@ -107,8 +112,6 @@ def sign_out(request):
         logout(request)
         # return render(request, 'register/sign_in.html') #render: টেমপ্লেট রেন্ডার করে in old url।
         return redirect('home') # redirect: নতুন URL-এ পুনঃনির্দেশ করে।
-    else:
-        return render(request, 'home.html')
     
 def active_user(request, user_id, token):
     try:
@@ -153,3 +156,17 @@ def group_list(request):
     groups = Group.objects.prefetch_related('permissions').all()
     
     return render(request, 'admin/group_list.html', {'groups': groups})
+
+class ProfileView(TemplateView):
+    template_name = 'accounts/profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['username'] = user.username
+        context['email'] = user.email
+        context['name'] = user.get_full_name()
+        context['member_since'] = user.date_joined
+        context['last_login'] = user.last_login
+        return context
+        
