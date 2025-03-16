@@ -2,15 +2,16 @@ from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
-from users.forms import RegisterForm, CustomRegisterForm, CustomLoginForm, AssignRoleForm, CreateGroupForm
+from users.forms import RegisterForm, CustomRegisterForm, CustomLoginForm, AssignRoleForm, CreateGroupForm, CustomChangePasswordForm
 from django.contrib import messages
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Prefetch
 from tasks.models import Task
 from django.db.models import Q, Count
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView
 from django.views.generic import TemplateView
+
 
 
 # checking function
@@ -170,3 +171,7 @@ class ProfileView(TemplateView):
         context['last_login'] = user.last_login
         return context
         
+
+class ChangePassword(PasswordChangeView):
+    template_name = "accounts/change_password.html"
+    form_class = CustomChangePasswordForm
