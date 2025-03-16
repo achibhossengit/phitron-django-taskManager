@@ -2,16 +2,16 @@ from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
-from users.forms import RegisterForm, CustomRegisterForm, CustomLoginForm, AssignRoleForm, CreateGroupForm, CustomChangePasswordForm
+from users.forms import RegisterForm, CustomRegisterForm, CustomLoginForm, AssignRoleForm, CreateGroupForm, CustomChangePasswordForm, PasswordReset, CustomPasswordResetConfirmForm
 from django.contrib import messages
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Prefetch
 from tasks.models import Task
 from django.db.models import Q, Count
-from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView
+from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetConfirmView
 from django.views.generic import TemplateView
-
+from django.urls import reverse_lazy
 
 
 # checking function
@@ -174,4 +174,31 @@ class ProfileView(TemplateView):
 
 class ChangePassword(PasswordChangeView):
     template_name = "accounts/change_password.html"
-    form_class = CustomChangePasswordForm
+    form_class = CustomChangePasswordForm # ChangePasswordDoneView is located in users.url
+
+
+class CustomPasswordReset(PasswordResetView):
+    form_class = PasswordReset
+    template_name = 'register/password_reset.html'
+    success_url = reverse_lazy('sign-in')
+    html_email_template_name = 'register/reset_mail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['protocol'] = 'https' if self.request.is_secure() else 'http'
+        context['domain'] = self.request.get_host()
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, "An Email was sent your email. Please check your Email Inbox.")
+        return super().form_valid(form)
+    
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    form_class = CustomPasswordResetConfirmForm
+    template_name = 'register/password_reset.html'
+    success_url = reverse_lazy('sign-in')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Password Reset Successfully!")
+        return super().form_valid(form)
+    

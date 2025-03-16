@@ -1,10 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
+    <div>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="font-bold text-center {% if message.tags == 'success' %}bg-green-500{% endif %} ">{{message}}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
     <div class="my-10 w-1/2 mx-auto">
         <form method='POST'>
             {% csrf_token %}
             {{form}}
             <button type="submit" class="hidden md:block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300 mt-3">Sign In</button>
         </form>
+        <a href="{% url 'password-reset' %}" class="hidden md:block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300 mt-3">Forget Password?</a>
     </div>
 {% endblock content %}
