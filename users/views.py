@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
-from users.forms import RegisterForm, CustomRegisterForm, CustomLoginForm, AssignRoleForm, CreateGroupForm, CustomChangePasswordForm, PasswordReset, CustomPasswordResetConfirmForm
+from users.forms import RegisterForm, CustomRegisterForm, CustomLoginForm, AssignRoleForm, CreateGroupForm, CustomChangePasswordForm, PasswordReset, CustomPasswordResetConfirmForm, EditProfileForm
 from django.contrib import messages
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -10,8 +10,9 @@ from django.db.models import Prefetch
 from tasks.models import Task
 from django.db.models import Q, Count
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetConfirmView
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, UpdateView
 from django.urls import reverse_lazy
+from users.models import UserProfile
 
 
 # checking function
@@ -64,8 +65,6 @@ def manager_dashboard(request):
         'tasks': tasks,
         'counts': counts
     }
-    print(request.user.username)
-    print(request.user.groups.first().name)
     return render(request, "dashboard/manager-dashboard.html", context)
 
 @user_passes_test(is_employee, login_url='no-permission')
@@ -82,7 +81,6 @@ def sign_up(request):
         form = CustomRegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            # print('user:', user)
             user.set_password(form.cleaned_data.get('password')) # for hasing
             user.is_active = False
             user.save()
@@ -202,3 +200,36 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
         messages.success(self.request, "Password Reset Successfully!")
         return super().form_valid(form)
     
+
+
+"""
+ইউজার যখন প্রোফাইল এডিট পেজে রিকুয়েস্ট করে, তখন EditProfileView এর get মেথড কল হয়।
+1. get_object মেথড থেকে বর্তমান ইউজারের ডেটা নেয়া হয়।
+2. get_context_data মেথড থেকে **কনটেক্সট ডেটা প্রস্তুত হয় এবং টেমপ্লেটে পাস করা হয়**।
+"""
+class EditProfileView(UpdateView):
+    model = User
+    form_class = EditProfileForm
+    template_name = 'accounts/update_form.html'
+    context_object_name = 'form'
+
+    def get_object(self):
+        return self.request.user
+    
+    # somehow 'userprofile' is override by EditProfileForm, thats why
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['userprofile'] = UserProfile.objects.get(user = self.request.user)
+        return kwargs
+        
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_profile = UserProfile.objects.get(user=self.request.user)
+        # যখন EditProfileForm তৈরি হবে, তখন এটি userprofile প্যারামিটার গ্রহণ করবে (যা get_context_data থেকে পাঠানো হয়)।
+        context['form'] = self.form_class(instance=self.object, userprofile=user_profile)
+        return context
+    
+    def form_valid(self, form):
+        form.save(commit=True)
+        return redirect('profile')

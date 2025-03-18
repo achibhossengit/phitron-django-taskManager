@@ -1,0 +1,15 @@
+{% extends "admin/dashboard.html" %}
+{% block content %}
+    <section>
+        {% if messages %}
+            {% for message in messages %}
+                <p class="text-center bg-green-500 font-semibold">{{message}}</p>
+            {% endfor %}
+        {% endif %}
+    </section>
+    <form class="mt-10 w-1/2 mx-auto" method="POST" enctype='multipart/form-data'>
+        {% csrf_token %}
+        {{form}}
+        <button type="submit" class="mt-5 px-5 py-2 rounded-md bg-sky-400">Submit</button>
+    </form>
+{% endblock content %}
