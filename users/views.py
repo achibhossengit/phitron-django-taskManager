@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.contrib.auth import authenticate, login, logout
 from users.forms import RegisterForm, CustomRegisterForm, CustomLoginForm, AssignRoleForm, CreateGroupForm, CustomChangePasswordForm, PasswordReset, CustomPasswordResetConfirmForm, EditProfileForm
 from django.contrib import messages
@@ -12,7 +12,8 @@ from django.db.models import Q, Count
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetConfirmView
 from django.views.generic import TemplateView, UpdateView
 from django.urls import reverse_lazy
-from users.models import UserProfile
+from users.models import CustomUser
+User = CustomUser
 
 
 # checking function
@@ -167,6 +168,9 @@ class ProfileView(TemplateView):
         context['name'] = user.get_full_name()
         context['member_since'] = user.date_joined
         context['last_login'] = user.last_login
+        context['bio'] = user.bio
+        context['profile_img'] = user.profile_img.url
+        context['role'] = user.groups.first().name
         return context
         
 
@@ -207,7 +211,7 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 1. get_object মেথড থেকে বর্তমান ইউজারের ডেটা নেয়া হয়।
 2. get_context_data মেথড থেকে **কনটেক্সট ডেটা প্রস্তুত হয় এবং টেমপ্লেটে পাস করা হয়**।
 """
-class EditProfileView(UpdateView):
+"""class EditProfileView(UpdateView):
     model = User
     form_class = EditProfileForm
     template_name = 'accounts/update_form.html'
@@ -232,4 +236,18 @@ class EditProfileView(UpdateView):
     
     def form_valid(self, form):
         form.save(commit=True)
+        return redirect('profile')"""
+
+class EditProfileView(UpdateView):
+    model = CustomUser
+    form_class = EditProfileForm
+    template_name = 'accounts/update_form.html'
+    context_object_name = 'form'
+
+    def get_object(self):
+        return self.request.user
+    
+
+    def form_valid(self, form):
+        form.save()
         return redirect('profile')
