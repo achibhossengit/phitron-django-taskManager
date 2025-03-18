@@ -37,8 +37,8 @@
             <div class="relative">
                 <button id="user-menu-button" class="flex items-center focus:outline-none">
                     <img
-                    {% if user.userprofile.profile_img %}
-                        src={{user.userprofile.profile_img.url}}
+                    {% if request.user.profile_img %}
+                        src={{request.user.profile_img.url}}
                     {% else %}
                         src="{% static 'images/avatar.png' %}"
                     {% endif %}

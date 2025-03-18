@@ -13,6 +13,7 @@ from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordCha
 from django.views.generic import TemplateView, UpdateView
 from django.urls import reverse_lazy
 from users.models import CustomUser
+from django.contrib.auth.mixins import LoginRequiredMixin
 User = CustomUser
 
 
@@ -157,7 +158,7 @@ def group_list(request):
     
     return render(request, 'admin/group_list.html', {'groups': groups})
 
-class ProfileView(TemplateView):
+class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'accounts/profile.html'
 
     def get_context_data(self, **kwargs):
@@ -238,7 +239,7 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
         form.save(commit=True)
         return redirect('profile')"""
 
-class EditProfileView(UpdateView):
+class EditProfileView(LoginRequiredMixin, UpdateView):
     model = CustomUser
     form_class = EditProfileForm
     template_name = 'accounts/update_form.html'
