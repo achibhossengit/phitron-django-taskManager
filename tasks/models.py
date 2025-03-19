@@ -8,20 +8,16 @@ class Task(models.Model):
         ("COMPLETED", 'Completed')
     )
     status = models.CharField(max_length=15, choices=STATUS_OPTIONS, default="PENDING")
-    # many to one
     project = models.ForeignKey(
         "project", 
         on_delete=models.CASCADE,
         default=1,
         related_name="tasks"
     )
-    # many to many
-    # assigned_to = models.ManyToManyField(Employee, related_name="tasks")
-    assigned_to = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="tasks")
+    assigned_to = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="tasks", blank=True)
     title = models.CharField(max_length=250)
     description = models.TextField()
     due_date = models.DateField()
-    # is_completed = models.BooleanField(default=False)
     created_at  = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     # taskdetail: reverse relations -> details: changed by related_name

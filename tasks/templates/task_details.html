@@ -94,9 +94,12 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="mt-5">
+                    <div class="mt-5 flex gap-5">
                         <a href="{% url "update-task" task.id %}" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">Edit</a>
-                        <a href="{% url "delete-task" task.id %}" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">Delete</a>
+                        <form method="POST" action="{% url 'delete-task' task.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">Delete</button>
+                        </form>
                     </div>
                 </div>
             </div>
