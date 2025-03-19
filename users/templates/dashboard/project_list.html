@@ -1,24 +1,53 @@
-<section>
-    <div>
+<table class="mx-auto bg-white rounded-xl shadow-sm mt-10 min-w-[500px] border border-gray-200">
+    <thead class="bg-gray-100">
+        <tr>
+            <th class="px-5 py-3 text-left text-sm font-semibold text-gray-600">Sl</th>
+            <th class="px-5 py-3 text-left text-sm font-semibold text-gray-600">Project Name</th>
+            <th class="px-5 py-3 text-left text-sm font-semibold text-gray-600">Description</th>
+            <th class="px-5 py-3 text-left text-sm font-semibold text-gray-600">Tasks</th>
+            <th class="px-5 py-3 text-left text-sm font-semibold text-gray-600">Operation</th>
+        </tr>
+    </thead>
+    <tbody>
         {% if projects %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Sl</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for project in projects %}
-                       <tr>
-                            <td>{{forloop.counter}}</td>
-                            <td>{{project.name}}</td>
-                            <td>{{project.description}}</td>
-                       </tr> 
-                    {% endfor %}
-                </tbody>
-            </table>
+            {% for project in projects %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-5 py-2 border border-gray-200 text-gray-700 text-sm">{{ forloop.counter }}</td>
+                <td class="px-5 py-2 border border-gray-200 text-gray-700 text-sm">
+                    <a href="{% url 'update-project' project.id %}" class="text-gray-600 hover:text-gray-800 font-medium">
+                        {{ project.name }}
+                    </a>
+                </td>
+                <td class="px-5 py-2 border border-gray-200 text-gray-700 text-sm">
+                    {{ project.description }}
+                </td>
+                {% if project.tasks.all %}
+                    <td class="px-5 py-2 border border-gray-200 max-h-32 overflow-auto text-gray-700 text-sm">
+                        <ol class="list-decimal list-inside">
+                            {% for task in project.tasks.all %}
+                                <li>
+                                    <a href="{% url 'task-details' task.id %}" class="text-gray-600 hover:text-gray-800">
+                                        {{ task.title }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    </td>
+                {% else %}
+                    <td colspan="1" class="pl-5 py-2 border border-gray-200 text-left text-gray-700">No tasks Available</td>
+                {% endif %}
+                <td class="border border-gray-200">
+                    <form action="{% url 'delete-project' project.id %}" method="post" class="flex justify-center">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-400 px-3 py-1 rounded-md">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="5" class="px-5 py-2 border border-gray-200 text-center text-gray-600">No Projects Available</td>
+            </tr>
         {% endif %}
-    </div>
-</section>
+    </tbody>
+</table>

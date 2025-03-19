@@ -1,17 +1,12 @@
 from django.shortcuts import render, redirect
-from tasks.forms import TaskModelForm, TaskDetialModelForm, ProjectModelForm
+from tasks.forms import TaskModelForm, TaskDetialModelForm, ProjectModelForm, StyledFormMixin
 from tasks.models import  Task, Project
-from django.http import HttpResponse
-from django.db.models import Q, Count, Max, Min, Avg
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.views import View
-from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic.base import ContextMixin
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView
+from django.views.generic import DetailView, UpdateView, DeleteView, CreateView
 from django.urls import reverse_lazy
-
 
 class CreateTask(LoginRequiredMixin, PermissionRequiredMixin, ContextMixin, View):
     permission_required = 'tasks.add_task'
@@ -95,25 +90,46 @@ class TaskDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
         task.save()
         return redirect('task-details', task.id)
 
-    
-
-def create_project(request):
-    project_form = ProjectModelForm()
-    if request.method == 'POST':
-        project_form = ProjectModelForm(request.POST)
-        if project_form.is_valid():
-            project_form.save()
-            print('projcet creation done')
-        else:
-            print('validations failed')
-    return render(request, 'form.html', {'project_form':project_form})
-
-
-class ShowProjects(ListView):
+class CreateProject(CreateView):
     model = Project
-    context_object_name = 'projects'
-    template_name = 'show_projects.html'
+    form_class = ProjectModelForm
+    template_name = 'form.html'
 
-    def get_queryset(self):
-        queryset = Project.objects.annotate(net_task=Count('tasks')).order_by('net_task')
-        return queryset
+    def get_success_url(self):
+        return reverse_lazy('dashboard') + '?type=projects'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project_form'] = context['form']
+        context.pop('form')
+        return context
+
+class UpdateProject(UpdateView):
+    model = Project
+    form_class = ProjectModelForm
+    template_name = 'form.html'
+    pk_url_kwarg = 'id'
+
+    def get_success_url(self):
+        return reverse_lazy('dashboard') + '?type=projects'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project_form'] = context['form']
+        context.pop('form')
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        messages.success(request, "Project Updated successfully!")
+        return super().post(request, *args, **kwargs)
+    
+class DeleteProject(DeleteView):
+    model = Project
+    pk_url_kwarg = 'id'
+
+    def get_success_url(self):
+        return reverse_lazy('dashboard') + '?type=projects'
+    
+    def post(self, request, *args, **kwargs):
+        messages.success(request, "Project Deleted successfully!")
+        return super().post(request, *args, **kwargs)

@@ -1,7 +1,7 @@
 <div>
     {% if messages %}
         {% for message in messages %}
-            <div class="font-bold text-center {% if message.tags == 'success' %}bg-green-500{% endif %} ">{{message}}</div>
+            <div class="font-bold text-white text-center py-3 {% if message.tags == 'success' %}bg-green-600{% endif %} ">{{message}}</div>
         {% endfor %}
     {% endif %}
 </div>

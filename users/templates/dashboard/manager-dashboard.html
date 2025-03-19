@@ -104,11 +104,15 @@
             </a>
         </section>
 
+        {% include "dashboard/messages.html" %}
         <!-- Tasks Section -->
-        {% block tasks %}
-        {% endblock tasks %}
-    </div>
-
-    {% include "dashboard/task_list.html" %}
-    
+        <div class="overflow-x-auto">
+            {% if projects %}
+                {% include "dashboard/project_list.html" %}
+            {% else %}
+                {% include "dashboard/task_list.html" %}
+            
+            {% endif %}
+        </div>
+    </div>    
 {% endblock content %}
