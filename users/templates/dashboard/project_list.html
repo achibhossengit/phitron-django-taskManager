@@ -1,0 +1,24 @@
+<section>
+    <div>
+        {% if projects %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sl</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                       <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{project.name}}</td>
+                            <td>{{project.description}}</td>
+                       </tr> 
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</section>

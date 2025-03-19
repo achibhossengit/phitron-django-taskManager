@@ -1,0 +1,89 @@
+<div class="overflow-x-auto">
+    <h3 class="text-center text-xl font-bold">{{ title }}</h3>
+    {% if title == 'Projects' %}
+        <table class="mx-auto bg-white rounded-xl shadow-sm mt-10 min-w-[500px]">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-5 py-3 text-left">Sl</th>
+                    <th class="px-5 py-3 text-left">Project Name</th>
+                    <th class="px-5 py-3 text-left">Description</th>
+                    <th class="px-5 py-3 text-left">Tasks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if projects %}
+                    {% for project in projects %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-5 py-2 border border-stone-200">{{ forloop.counter }}</td>
+                        <td class="px-5 py-2 border border-stone-200">
+                            <a href="#" class="text-black hover:text-gray-500">
+                                {{ project.name }}
+                            </a>
+                        </td>
+                        <td class="px-5 py-2 border border-stone-200">
+                            {{project.description}}
+                        </td>
+                        <td class="px-5 py-2 border border-stone-200 flex -space-x-2 max-h-40 overflow-y-scroll">
+                            <ol class="list-decimal list-inside">
+                                {% for task in project.tasks.all %}
+                                    <li class="text-black hover:text-gray-500"><a href="{% url 'task-details' task.id %}">{{ task.title }}</a></li>
+                                {% endfor %}
+                            </ol>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="px-5 py-2 text-center">No Projects Available</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    {% else %}
+        <table class="mx-auto bg-white rounded-xl shadow-sm mt-10 min-w-[500px]">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-5 py-3 text-left">Sl</th>
+                    <th class="px-5 py-3 text-left">Title</th>
+                    <th class="px-5 py-3 text-left">Priority</th>
+                    <th class="px-5 py-3 text-left">Team</th>
+                    <th class="px-5 py-3 text-left">Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if tasks %}
+                    {% for task in tasks %}
+                    <tr class="border-t border-b border-stone-200 hover:bg-gray-50">
+                        <td class="px-5 py-2">{{ forloop.counter }}</td>
+                        <td class="px-5 py-2">
+                            <a href="{% url 'task-details' task.id %}" class="text-black hover:text-gray-500">
+                                {{ task.title }}
+                            </a>
+                        </td>
+                        <td class="px-5 py-2">
+                            <span class="px-2 py-1 rounded-full 
+                                {% if task.details.priority == 'high' %}bg-red-100 text-red-800
+                                {% elif task.details.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ task.details.get_priority_display }}
+                            </span>
+                        </td>
+                        <td class="px-5 py-2 flex -space-x-2">
+                            {% for employee in task.assigned_to.all %}
+                                <div class="w-8 h-8 rounded-full text-white bg-blue-500 flex justify-center items-center text-sm border-2 border-white">
+                                    {{ employee.first_name|slice:':2' }}
+                                </div>
+                            {% endfor %}
+                        </td>
+                        <td class="px-5 py-2">{{ task.created_at|timesince }} ago</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="px-5 py-2 text-center">No tasks Available</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>

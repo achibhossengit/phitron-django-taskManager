@@ -1,11 +1,9 @@
 from django.urls import path
-from users.views import sign_up, sign_in, sign_out, active_user, admin_dashboard, manager_dashboard, employee_dashboard, assign_role, create_group, group_list, CustomLoginView, ProfileView, ChangePassword, CustomPasswordReset, CustomPasswordResetConfirmView, EditProfileView
+from users.views import sign_up, sign_in, sign_out, active_user, dashboard, assign_role, create_group, group_list, CustomLoginView, ProfileView, ChangePassword, CustomPasswordReset, CustomPasswordResetConfirmView, EditProfileView
 from core.views import home
 from django.contrib.auth.views import LogoutView, PasswordChangeDoneView
 urlpatterns = [
-    path('admin/dashboard/', admin_dashboard, name='admin-dashboard'),
-    path('manager-dashboard/', manager_dashboard, name='manager-dashboard'),
-    path('employee-dashboard/', employee_dashboard, name='employee-dashboard'),
+    path('dashboard', dashboard, name='dashboard'),
     path('sign-up/', sign_up, name='sign-up'),
     # path('sign-in/', sign_in, name='sign-in'),
     path('sign-in/', CustomLoginView.as_view(template_name="register/sign_in.html"), name='sign-in'),

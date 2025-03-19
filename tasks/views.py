@@ -75,21 +75,8 @@ class DeleteTask(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     pk_url_kwarg = 'task_id'
     success_url = reverse_lazy('manager-dashboard')
 
-    
-@login_required()
-@permission_required(perm='tasks.view_task', login_url='no-permission')
-def task_details(request, task_id):
-    task = Task.objects.get(id=task_id)
-    status_options = Task.STATUS_OPTIONS
-    if request.method == 'POST':
-        selected_status = request.POST.get('task_status')
-        task.status = selected_status
-        task.save()
-        redirect('task-details', task.id)
-
-    return render(request, 'task_details.html', {'task': task, 'status_options': status_options})
-
-class TaskDetail(DetailView):
+class TaskDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    permission_required = 'tasks.view_task'
     model = Task
     template_name = 'task_details.html'
     context_object_name = 'task'
@@ -121,14 +108,6 @@ def create_project(request):
             print('validations failed')
     return render(request, 'form.html', {'project_form':project_form})
 
-
-@login_required()
-@permission_required(perm='tasks.view_task', login_url='no-permission')
-def show_projects(request):
-    tasks = Task.objects.aggregate(net_task= Count('id'))
-    """ Data Retrive (django aggregations)"""
-    projects = Project.objects.annotate(net_task=Count('tasks')).order_by('net_task')
-    return render(request, 'show_projects.html', {'tasks':tasks, 'projects': projects})
 
 class ShowProjects(ListView):
     model = Project

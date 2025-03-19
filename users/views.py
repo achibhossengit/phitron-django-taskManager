@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Prefetch
-from tasks.models import Task
+from tasks.models import Task, Project
 from django.db.models import Q, Count
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetConfirmView
 from django.views.generic import TemplateView, UpdateView
@@ -25,53 +25,113 @@ def is_manager(user):
 def is_employee(user):
     return user.groups.filter(name='Employee').exists()
 
-@user_passes_test(is_admin, login_url='no-permission')
-def admin_dashboard(request):
-    users = User.objects.prefetch_related(
-        Prefetch('groups', queryset=Group.objects.all(), to_attr='all_groups')
-    ).all()
-
-    for user in users:
-        if user.all_groups:
-            # user.group_name = user.groups.first().name
-            user.group_name = user.all_groups[0].name
-        else:
-            user.group_name = 'No Group Assigned'
-    return render(request, 'admin/dashboard.html', {'users': users})
-
-@user_passes_test(is_manager, login_url='no-permission')
-def manager_dashboard(request):
+def dashboard(request):
     type = request.GET.get('type', 'all')
+    title = 'Total Task'
+    if is_admin(request.user):
+        users = User.objects.prefetch_related( 
+            Prefetch('groups', queryset=Group.objects.all(), to_attr='all_groups')).all()
+        for user in users:
+            if user.all_groups:
+                user.group_name = user.all_groups[0].name
+            else:
+                user.group_name = 'No Group Assigned'
+        return render(request, 'admin/dashboard.html', {'users': users})
     
-    # getting task count
-    counts = Task.objects.aggregate(
-        total=Count('id'),
-        completed=Count('id', filter=Q(status='COMPLETED')),
-        in_progress=Count('id', filter=Q(status='IN_PROGRESS')),
-        pending=Count('id', filter=Q(status='PENDING'))
+    elif is_manager(request.user):
+        # getting task count
+        counts = Task.objects.aggregate(
+            total=Count('id'),
+            completed=Count('id', filter=Q(status='COMPLETED')),
+            in_progress=Count('id', filter=Q(status='IN_PROGRESS')),
+            pending=Count('id', filter=Q(status='PENDING'))
+            
+            )
+        # Retriving task data
+        base_query = Task.objects.select_related('details').prefetch_related('assigned_to')
+        projects = None
+        tasks = None
         
-        )
-    # Retriving task data
-    base_query = Task.objects.select_related('details').prefetch_related('assigned_to')
+        if type == 'completed':
+            tasks = base_query.filter(status='COMPLETED')
+            title = 'Completed Tasks'
+        elif type == 'in_progress':
+            tasks = base_query.filter(status='IN_PROGRESS')
+            title = 'In Progress Tasks'
+        elif type == 'pending':
+            tasks = base_query.filter(status='PENDING')
+            title = 'Pending Tasks'
+        elif type == 'projects':
+            projects = Project.objects.all()
+            title = 'Projects'
+        else:
+            tasks = base_query.all()
+
+        context = {
+            'tasks': tasks,
+            'counts': counts,
+            'projects': projects,
+            'title': title,
+        }
+        return render(request, "dashboard/manager-dashboard.html", context)
     
-    if type == 'completed':
-        tasks = base_query.filter(status='COMPLETED')
-    if type == 'in_progress':
-        tasks = base_query.filter(status='IN_PROGRESS')
-    if type == 'pending':
-        tasks = base_query.filter(status='PENDING')
-    if type == 'all':
-        tasks = base_query.all()
+    elif is_employee(request.user):
+        return render(request, "dashboard/employee-dashboard.html")
 
-    context = {
-        'tasks': tasks,
-        'counts': counts
-    }
-    return render(request, "dashboard/manager-dashboard.html", context)
 
-@user_passes_test(is_employee, login_url='no-permission')
-def employee_dashboard(request):
-    return render(request, "dashboard/employee-dashboard.html")
+
+# @user_passes_test(is_admin, login_url='no-permission')
+# def admin_dashboard(request):
+#     users = User.objects.prefetch_related(
+#         Prefetch('groups', queryset=Group.objects.all(), to_attr='all_groups')
+#     ).all()
+
+#     for user in users:
+#         if user.all_groups:
+#             # user.group_name = user.groups.first().name
+#             user.group_name = user.all_groups[0].name
+#         else:
+#             user.group_name = 'No Group Assigned'
+#     return render(request, 'admin/dashboard.html', {'users': users})
+
+# @user_passes_test(is_manager, login_url='no-permission')
+# def manager_dashboard(request):
+#     type = request.GET.get('type', 'all')
+    
+#     # getting task count
+#     counts = Task.objects.aggregate(
+#         total=Count('id'),
+#         completed=Count('id', filter=Q(status='COMPLETED')),
+#         in_progress=Count('id', filter=Q(status='IN_PROGRESS')),
+#         pending=Count('id', filter=Q(status='PENDING'))
+        
+#         )
+#     # Retriving task data
+#     base_query = Task.objects.select_related('details').prefetch_related('assigned_to')
+#     projects = None
+#     tasks = None
+    
+#     if type == 'completed':
+#         tasks = base_query.filter(status='COMPLETED')
+#     elif type == 'in_progress':
+#         tasks = base_query.filter(status='IN_PROGRESS')
+#     elif type == 'pending':
+#         tasks = base_query.filter(status='PENDING')
+#     elif type == 'projects':
+#         projects = Project.objects.all()
+#     else:
+#         tasks = base_query.all()
+
+#     context = {
+#         'tasks': tasks,
+#         'counts': counts,
+#         'projects': projects
+#     }
+#     return render(request, "dashboard/manager-dashboard.html", context)
+
+# @user_passes_test(is_employee, login_url='no-permission')
+# def employee_dashboard(request):
+#     return render(request, "dashboard/employee-dashboard.html")
 
 
 
