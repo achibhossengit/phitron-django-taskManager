@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+  {% include "dashboard/messages.html" %}
+  
+  <!-- কার্ড সেকশন -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
+    <!-- ইউজার কার্ড -->
+    <a href="{% url 'dashboard' %}?type=users" class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-300">
+      <div class="text-blue-600 text-4xl mb-4">
+        <i class="fa-solid fa-user-tie"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-800 mb-2">User</h3>
+      <p class="text-gray-500">Show and Customize</p>
+    </a>
+    
+    <!-- টাস্ক কার্ড -->
+    <a href="{% url 'dashboard' %}?type=all"  class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-300">
+      <div class="text-green-600 text-4xl mb-4">
+        <i class="fa-solid fa-list-check"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-800 mb-2">Tasks</h3>
+      <p class="text-gray-500">Access and Update</p>
+    </a>
+    
+    <!-- প্রোজেক্ট কার্ড -->
+    <a href="{% url 'dashboard' %}?type=projects"  class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-300">
+      <div class="text-purple-600 text-4xl mb-4">
+        <i class="fa-solid fa-bars-progress"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-800 mb-2">Projects</h3>
+      <p class="text-gray-500">Access and Update</p>
+    </a>
+    
+    <!-- গ্রুপ কার্ড -->
+    <a href="{% url 'dashboard' %}?type=groups"  class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-300">
+      <div class="text-orange-600 text-4xl mb-4">
+        <i class="fa-solid fa-people-group"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-800 mb-2">Groups</h3>
+      <p class="text-gray-500">Customize Groups</p>
+    </a>
+  </div>
+
+  <!-- ইউজার লিস্ট -->
+  <div class="mt-8 p-6">
+    {% if users %}
+      {% include "admin/user_list.html" %}
+    {% elif tasks %}
+      {% include "dashboard/task_list.html" %}
+    {% elif projects %}
+      {% include "dashboard/project_list.html" %}
+    {% elif groups %}
+      {% include "admin/group_list.html" %}
+    {% endif %}
+  </div>
+{% endblock content %}

@@ -7,6 +7,9 @@
     <title>TaskMaster - Efficient Task Management</title>
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
 
+    {% comment %} font-awsome {% endcomment %}
+    <script src="https://kit.fontawesome.com/aa3a5bcb91.js" crossorigin="anonymous"></script>
+
     {% comment %} font family {% endcomment %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +53,7 @@
       </script>
     </header>
 
-    <main class="min-h-screen">
+    <main class="min-h-screen max-w-[1470px] mx-auto">
       {% block content %}
           {% comment %} dynamic code {% endcomment %}
       {% endblock content %}

@@ -28,16 +28,39 @@ def is_employee(user):
 
 def dashboard(request):
     type = request.GET.get('type', 'all')
-    title = 'Total Task'
+    base_query = Task.objects.select_related('details').prefetch_related('assigned_to')
     if is_admin(request.user):
-        users = User.objects.prefetch_related( 
-            Prefetch('groups', queryset=Group.objects.all(), to_attr='all_groups')).all()
-        for user in users:
-            if user.all_groups:
-                user.group_name = user.all_groups[0].name
-            else:
-                user.group_name = 'No Group Assigned'
-        return render(request, 'admin/dashboard.html', {'users': users})
+        users = None
+        tasks = None
+        projects = None
+        groups = None
+        if type == 'all':
+            tasks = base_query.all()
+            title = 'All Tasks'
+        elif type == 'users':
+            users = User.objects.prefetch_related( 
+                Prefetch('groups', queryset=Group.objects.all(), to_attr='all_groups')).all()
+            for user in users:
+                if user.all_groups:
+                    user.group_name = user.all_groups[0].name
+                else:
+                    user.group_name = 'No Group Assigned'
+            title = 'All of Your Users'
+        elif type == 'projects':
+            projects = Project.objects.all()
+            title = 'Projects'
+        elif type == 'groups':
+            groups = Group.objects.all()
+            title = 'Groups And Permissions'
+
+        context = {
+            'tasks': tasks,
+            'users': users,
+            'projects': projects,
+            'groups': groups,
+            'title': title
+        }
+        return render(request, 'dashboard/admin-dashboard.html', context)
     
     elif is_manager(request.user):
         # getting task count
@@ -49,10 +72,9 @@ def dashboard(request):
             
             )
         # Retriving task data
-        base_query = Task.objects.select_related('details').prefetch_related('assigned_to')
         projects = None
         tasks = None
-        
+       
         if type == 'completed':
             tasks = base_query.filter(status='COMPLETED')
             title = 'Completed Tasks'
@@ -67,6 +89,7 @@ def dashboard(request):
             title = 'Projects'
         else:
             tasks = base_query.all()
+            title = 'All Tasks'
 
         context = {
             'tasks': tasks,

@@ -1,5 +1,6 @@
-<table class="mx-auto bg-white rounded-xl shadow-sm mt-10 min-w-[500px]">
-    <thead class="bg-gray-50">
+<h2 class="text-2xl text-center font-bold mb-4">{{title}}</h2>
+<table class="mx-auto bg-white rounded-xl shadow-sm mt-5 min-w-[500px]">
+    <thead class="bg-gradient-to-r from-green-200 via-green-400 to-green-200">
         <tr>
             <th class="px-5 py-3 text-left text-gray-600">Sl</th>
             <th class="px-5 py-3 text-left text-gray-600">Title</th>
@@ -33,7 +34,7 @@
                         </div>
                     {% endfor %}
                 </td>
-                <td class="px-5 py-2 text-gray-600">{{ task.created_at|timesince }} ago</td>
+                <td class="px-5 py-2 text-gray-600 text-sm">{{ task.created_at|timesince }} ago</td>
             </tr>
             {% endfor %}
         {% else %}

@@ -1,5 +1,6 @@
-<table class="mx-auto bg-white rounded-xl shadow-sm mt-10 min-w-[500px] border border-gray-200">
-    <thead class="bg-gray-100">
+<h3 class="text-2xl text-center font-bold mb-4">{{title}}</h3>
+<table class="mx-auto bg-white rounded-xl shadow-sm mt-5 min-w-[500px] border border-gray-200">
+    <thead class="bg-gradient-to-r from-purple-300 via-purple-400 to-purple-300">
         <tr>
             <th class="px-5 py-3 text-left text-sm font-semibold text-gray-600">Sl</th>
             <th class="px-5 py-3 text-left text-sm font-semibold text-gray-600">Project Name</th>
@@ -39,7 +40,7 @@
                 <td class="border border-gray-200">
                     <form action="{% url 'delete-project' project.id %}" method="post" class="flex justify-center">
                         {% csrf_token %}
-                        <button type="submit" class="bg-red-400 px-3 py-1 rounded-md">Delete</button>
+                        <button type="submit" class="bg-purple-400 px-3 py-1 rounded-md">Delete</button>
                     </form>
                 </td>
             </tr>

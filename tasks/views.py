@@ -90,7 +90,7 @@ class TaskDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
         task.save()
         return redirect('task-details', task.id)
 
-class CreateProject(CreateView):
+class CreateProject(LoginRequiredMixin, CreateView):
     model = Project
     form_class = ProjectModelForm
     template_name = 'form.html'
@@ -104,7 +104,9 @@ class CreateProject(CreateView):
         context.pop('form')
         return context
 
-class UpdateProject(UpdateView):
+class UpdateProject(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'tasks.change_project'
+    # login_url = 'no-permission'
     model = Project
     form_class = ProjectModelForm
     template_name = 'form.html'
@@ -123,7 +125,9 @@ class UpdateProject(UpdateView):
         messages.success(request, "Project Updated successfully!")
         return super().post(request, *args, **kwargs)
     
-class DeleteProject(DeleteView):
+class DeleteProject(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = 'tasks.delete_project'
+    # login_url = 'no-permission'
     model = Project
     pk_url_kwarg = 'id'
 

@@ -7,5 +7,5 @@ from django.conf import settings
 
 urlpatterns = [
     path('', home, name='home_page'),
-    path('no-permission', no_permission, name='no_permission')
+    path('no-permission', no_permission, name='no-permission')
 ]
