@@ -14,6 +14,7 @@ from django.views.generic import TemplateView, UpdateView
 from django.urls import reverse_lazy
 from users.models import CustomUser
 from django.contrib.auth.mixins import LoginRequiredMixin
+from datetime import date
 User = CustomUser
 
 
@@ -76,7 +77,10 @@ def dashboard(request):
         return render(request, "dashboard/manager-dashboard.html", context)
     
     elif is_employee(request.user):
-        return render(request, "dashboard/employee-dashboard.html")
+        tasks = request.user.tasks.all()
+        today_tasks = tasks.filter(due_date=date.today())
+        context = {'tasks': tasks, 'today_tasks': today_tasks}
+        return render(request, "dashboard/employee-dashboard.html", context)
 
 def sign_up(request):
     if request.method == 'GET':

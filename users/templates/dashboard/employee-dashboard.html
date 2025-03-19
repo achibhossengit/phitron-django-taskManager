@@ -2,82 +2,66 @@
 
 {% block content %}
 <section class="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-5 max-w-[1470px] mx-auto">
-    <div class="bg-white rounded-sm p-5">
-        <h1 class="text-2xl font-bold">Today's Tasks</h1>
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2 mt-2">
-                <div class="w-2 h-2 rounded-full bg-green-600"></div>
-                <h3>Complete Project Proposal</h3>
+    <div class="bg-white rounded-lg shadow-md p-6">
+        {% comment %} today tasks {% endcomment %}
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Today's Tasks</h1>
+        {% if today_tasks %}
+            <div class="space-y-3">
+                {% for task in today_tasks %}
+                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-all">
+                        <div class="flex items-center gap-3">
+                            <div class="w-2 h-2 rounded-full bg-green-600"></div>
+                            <h3 class="text-gray-700">{{task.title}}</h3>
+                        </div>
+                        <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{{task.details.priority}}</span>
+                    </div>
+                {% endfor %}
             </div>
-            <div>
-                <span class="text-gray-500">High</span>
-            </div>
-        </div>
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2 mt-2">
-                <div class="w-2 h-2 rounded-full bg-yellow-600"></div>
-                <h3>Review team updates</h3>
-            </div>
-            <div>
-                <span class="text-gray-500">Normal</span>
-            </div>
-        </div>
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2 mt-2">
-                <div class="w-2 h-2 rounded-full bg-purple-600"></div>
-                <h3>Prepare for client meeting</h3>
-            </div>
-            <div>
-                <span class="text-gray-500">Low</span>
-            </div>
-        </div>
+        {% else %}
+            <p class="text-gray-500 mt-5">No tasks available for today!</p>
+        {% endif %}
     </div>
-    <div class="bg-white rounded-sm p-5">
-        <h1 class="text-2xl font-bold">All Tasks</h1>
-        <div class="grid grid-cols-4 mt-2 gap-5">
-            <h2 class="text-gray-500 font-bold">Task Title</h2>
-            <h2 class="text-gray-500 font-bold">Priority</h2>
-            <h2 class="text-gray-500 font-bold">Team</h2>
-            <h2 class="text-gray-500 font-bold">Created At</h2>
-            {% comment %} Task 1  {% endcomment %}
-            <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-green-600"></div>
-                <h3>Test task 1</h3>
-            </div>
-            <h3 class="w-10 rounded-md flex justify-center items-center text-blue-600 bg-blue-100">Low</h3>
-            <div class="flex -space-x-2">
-                <span class="w-8 h-8 flex justify-center items-center rounded-full bg-blue-600 text-white text-sm border-2 border-white">BC</span>
-                <span class="w-8 h-8 flex justify-center items-center rounded-full bg-green-600 text-white text-sm border-2 border-white">AB</span>
-                <span class="w-8 h-8 flex justify-center items-center rounded-full bg-violet-600 text-white text-sm border-2 border-white">DA</span>
-            </div>
-            <h3 class="text-gray-400">9 months ago</h3>
-            
-            {% comment %} task 2  {% endcomment %}
-            <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-green-600"></div>
-                <h3>Test task 2</h3>
-            </div>
-            <h3 class="w-10 rounded-md flex justify-center items-center text-green-600 bg-green-100">Normal</h3>
-            <div class="flex -space-x-2">
-                <span class="w-8 h-8 flex justify-center items-center rounded-full bg-green-600 text-white text-sm border-2 border-white">AB</span>
-                <span class="w-8 h-8 flex justify-center items-center rounded-full bg-violet-600 text-white text-sm border-2 border-white">DA</span>
-                <span class="w-8 h-8 flex justify-center items-center rounded-full bg-blue-600 text-white text-sm border-2 border-white">BC</span>
-            </div>
-            <h3 class="text-gray-400">9 months ago</h3>
 
-            {% comment %} task 3  {% endcomment %}
-            <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-green-600"></div>
-                <h3>Test task 3</h3>
+    {% comment %} all tasks {% endcomment %}
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Your Tasks</h1>
+        {% if tasks %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Task Title</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Priority</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Team</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for task in tasks %}
+                            <tr class="hover:bg-gray-50 transition-all">
+                                <td class="px-4 py-3 flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-green-600"></div>
+                                    <span class="text-gray-700">{{task.title}}</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded">{{task.details.priority}}</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex -space-x-2">
+                                        {% for emp in task.assigned_to.all %}
+                                            <span class="w-8 h-8 flex justify-center items-center rounded-full bg-blue-600 text-white text-sm border-2 border-white">{{emp.first_name|slice:":2"}}</span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-gray-400">{{task.due_date}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <h3 class="w-10 rounded-md flex justify-center items-center text-red-600 bg-red-100">High</h3>
-            <div class="flex -space-x-2">
-                <span class="w-8 h-8 flex justify-center items-center rounded-full bg-green-600 text-white text-sm border-2 border-white">AB</span>
-                <span class="w-8 h-8 flex justify-center items-center rounded-full bg-blue-600 text-white text-sm border-2 border-white">BC</span>
-                <span class="w-8 h-8 flex justify-center items-center rounded-full bg-yellow-600 text-white text-sm border-2 border-white">DA</span>
-            </div>
-            <h3 class="text-gray-400">9 months ago</h3>
-        </div>
+        {% else %}
+            <p class="text-gray-500 mt-5">No tasks available for you!</p>
+        {% endif %}
     </div>
 </section>
 {% endblock content %}
