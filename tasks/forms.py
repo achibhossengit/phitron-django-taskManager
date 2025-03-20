@@ -19,12 +19,11 @@ class StyledFormMixin:
                 })
             elif isinstance(field.widget, forms.Textarea):
                 field.widget.attrs.update({
-                    'class': f'{self.default_classes} ',
+                    'class': self.default_classes,
                     'placeholder': f'Enter {field.label.lower()}',
                     'rows': 5
                 })
             elif isinstance(field.widget, forms.SelectDateWidget):
-                # print("inside date filed")
                 field.widget.attrs.update({
                     'class': 'border-2 rounded-md my-5'
                 })

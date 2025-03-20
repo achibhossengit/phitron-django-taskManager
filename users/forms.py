@@ -3,19 +3,10 @@ import re
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 from django.contrib.auth.models import Group, Permission
 from tasks.forms import StyledFormMixin
+from django.contrib.auth.hashers import make_password
 from users.models import CustomUser
 User = CustomUser
 
-class RegisterForm(UserCreationForm):
-    class Meta:
-        model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
-    def __init__(self, *args, **kwargs):
-        super(UserCreationForm, self).__init__(*args, **kwargs)
-
-        for field_name in ['username', 'password1', 'password2']:
-            self.fields[field_name].help_text = None
-# custom model form 
 class CustomRegisterForm(StyledFormMixin, forms.ModelForm):
     password = forms.CharField()
     confirm_password = forms.CharField()
@@ -27,14 +18,6 @@ class CustomRegisterForm(StyledFormMixin, forms.ModelForm):
     def clean_password(self):
         password = self.cleaned_data.get('password')
         pattern = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&+=]).{8,}$"
-
-        # it will raise single errors in one time
-        # if len(password) < 8:
-        #     raise forms.ValidationError("Password must be at least 8 character long")
-        # if not re.fullmatch(pattern, password):
-        #     raise forms.ValidationError("Password must include uppercase, lowercase, number & special character")
-
-        # it will raise multiple errors in one time
         errors = []
         if len(password) < 8:
             errors.append("Password must be at least 8 character long")
@@ -64,7 +47,6 @@ class CustomRegisterForm(StyledFormMixin, forms.ModelForm):
             raise forms.ValidationError("This email address is already registered. Please try another.")
         
         return email
-    
 
 class CustomLoginForm(StyledFormMixin, AuthenticationForm):
     def __init__(self, *args, **kwargs):
@@ -76,12 +58,6 @@ class AssignRoleForm(StyledFormMixin, forms.Form):
         queryset=Group.objects.all(),
         empty_label="Choice a Role"
     )
-
-# class CreateGroupForm(StyledFormMixin, forms.ModelForm):
-#     class Meta:
-#         model = Group
-#         fields = '__all__'
-
 
 class CreateGroupForm(StyledFormMixin, forms.ModelForm):
     # for customizations. basicially, its overright default widgets and attrs of permissions field of Group table

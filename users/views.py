@@ -1,20 +1,19 @@
 from django.shortcuts import render, redirect, HttpResponse
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import Group
-from django.contrib.auth import authenticate, login, logout
-from users.forms import RegisterForm, CustomRegisterForm, CustomLoginForm, AssignRoleForm, CreateGroupForm, CustomChangePasswordForm, PasswordReset, CustomPasswordResetConfirmForm, EditProfileForm
+from users.forms import CustomRegisterForm, CustomLoginForm, AssignRoleForm, CreateGroupForm, CustomChangePasswordForm, PasswordReset, CustomPasswordResetConfirmForm, EditProfileForm
 from django.contrib import messages
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Prefetch
 from tasks.models import Task, Project
 from django.db.models import Q, Count
-from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetConfirmView
-from django.views.generic import TemplateView, UpdateView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetConfirmView
+from django.views.generic import TemplateView, UpdateView, CreateView
 from django.urls import reverse_lazy
 from users.models import CustomUser
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from datetime import date
+from django.views import View
 User = CustomUser
 
 
@@ -105,56 +104,40 @@ def dashboard(request):
         context = {'tasks': tasks, 'today_tasks': today_tasks}
         return render(request, "dashboard/employee-dashboard.html", context)
 
-def sign_up(request):
-    if request.method == 'GET':
-        form = CustomRegisterForm()
-        return render(request, 'register/sign_up.html', {'form': form})
-    elif request.method == 'POST':
-        form = CustomRegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data.get('password')) # for hasing
-            user.is_active = False
-            user.save()
-            messages.success(request, 'User Added Successfully! Please check your email for log in.')
-            return redirect('sign-in')
-        else:
-            print('Form Validation error')
-            return render(request, 'register/sign_up.html', {'form': form})
 
+class SignUp(CreateView):
+    model = CustomUser
+    form_class = CustomRegisterForm
+    pk_url_kwarg = 'id'
+    template_name = 'register/sign_up.html'
+    success_url = reverse_lazy('sign-in')
 
-def sign_in(request):
-    form = CustomLoginForm()
-    if request.method=='POST':
-        form = CustomLoginForm(data = request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('home')
-
-    return render(request, 'register/sign_in.html', {'form': form}) # for get request
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.set_password(form.cleaned_data.get('password')) # hashing
+        user.is_active = False
+        self.object = user.save()
+        return super().form_valid(form)
+            
 
 class CustomLoginView(LoginView):
     form_class = CustomLoginForm
 
-@login_required(login_url='sign-in')
-def sign_out(request):
-    if request.method == 'POST':
-        logout(request)
-        # return render(request, 'register/sign_in.html') #render: টেমপ্লেট রেন্ডার করে in old url।
-        return redirect('home') # redirect: নতুন URL-এ পুনঃনির্দেশ করে।
-    
-def active_user(request, user_id, token):
-    try:
-        user = User.objects.get(id=user_id)
-        if default_token_generator.check_token(user, token):
-            user.is_active = True
-            user.save()
-            return redirect('sign-in')
-        else:
-            return HttpResponse('Invalid token or user id!')
-    except User.DoesNotExist:
-        return HttpResponse('User not found')
+# Logout view in urls
+
+class ActiveUserView(View):
+    def get(self, request, user_id, token):
+        try:
+            user = User.objects.get(id=user_id)
+            if default_token_generator.check_token(user, token):
+                user.is_active = True
+                user.save()
+                return redirect('sign-in')
+            else:
+                return HttpResponse('Invalid token or user id!')
+        except User.DoesNotExist:
+            return HttpResponse('User not found')
+
     
 @user_passes_test(is_admin, login_url='no-permission')
 def assign_role(request, user_id):
@@ -168,25 +151,38 @@ def assign_role(request, user_id):
             user.groups.add(role)
             user.save()
             messages.success(request, f"{user.username} has been assigned to {role.name} role")
-            return redirect('admin-dashboard')
+            return redirect('dashboard')
     return render(request, 'admin/assign_role.html', {'form': form})
 
-@user_passes_test(is_admin, login_url='no-permission')
-def create_group(request):
-    form = CreateGroupForm()
-    if request.method == 'POST':
-        form = CreateGroupForm(request.POST)
-        if form.is_valid():
-            group = form.save()
-            messages.success(request, f"{group.name} Group created successfully!")
-            return redirect('create-group')
-    return render(request, 'admin/create_group.html', {'form':form})
+class AssignRole(View):
+    def get(self, request, user_id):
+        form = AssignRoleForm()
+        return render(request, 'admin/assign_role.html', {'form': form})
 
-@user_passes_test(is_admin, login_url='no-permission')
-def group_list(request):
-    groups = Group.objects.prefetch_related('permissions').all()
-    
-    return render(request, 'admin/group_list.html', {'groups': groups})
+    def post(self, request, user_id):
+        user = User.objects.get(id=user_id)
+        form = AssignRoleForm(request.POST)
+        if form.is_valid():
+            role = form.cleaned_data.get('role')
+            user.groups.clear()
+            user.groups.add(role)
+            user.save()
+            messages.success(request, f"{user.username} has been assigned to {role.name} role")
+            return redirect('dashboard')
+        
+
+class CreateGroup(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'group.add_group'
+    model = Group
+    form_class = CreateGroupForm
+    template_name = 'admin/create_group.html'
+    success_url = reverse_lazy('dashboard')
+    pk_url_kwarg = 'id'
+
+    def post(self, request, *args, **kwargs):
+        messages.success(request, "Groups Created Successfully!")
+        return super().post(request, *args, **kwargs)
+
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'accounts/profile.html'
@@ -235,39 +231,6 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
         messages.success(self.request, "Password Reset Successfully!")
         return super().form_valid(form)
     
-
-
-"""
-ইউজার যখন প্রোফাইল এডিট পেজে রিকুয়েস্ট করে, তখন EditProfileView এর get মেথড কল হয়।
-1. get_object মেথড থেকে বর্তমান ইউজারের ডেটা নেয়া হয়।
-2. get_context_data মেথড থেকে **কনটেক্সট ডেটা প্রস্তুত হয় এবং টেমপ্লেটে পাস করা হয়**।
-"""
-"""class EditProfileView(UpdateView):
-    model = User
-    form_class = EditProfileForm
-    template_name = 'accounts/update_form.html'
-    context_object_name = 'form'
-
-    def get_object(self):
-        return self.request.user
-    
-    # somehow 'userprofile' is override by EditProfileForm, thats why
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['userprofile'] = UserProfile.objects.get(user = self.request.user)
-        return kwargs
-        
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user_profile = UserProfile.objects.get(user=self.request.user)
-        # যখন EditProfileForm তৈরি হবে, তখন এটি userprofile প্যারামিটার গ্রহণ করবে (যা get_context_data থেকে পাঠানো হয়)।
-        context['form'] = self.form_class(instance=self.object, userprofile=user_profile)
-        return context
-    
-    def form_valid(self, form):
-        form.save(commit=True)
-        return redirect('profile')"""
 
 class EditProfileView(LoginRequiredMixin, UpdateView):
     model = CustomUser

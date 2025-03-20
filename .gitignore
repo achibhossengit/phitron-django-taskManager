@@ -5,3 +5,4 @@ db.sqlite3
 node_modules/
 requirements.txt
 .env
+future_design.txt

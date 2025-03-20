@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-  {% include "dashboard/messages.html" %}
-  
-  <!-- কার্ড সেকশন -->
+
+  {% comment %} Card section {% endcomment %}
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
-    <!-- ইউজার কার্ড -->
+    {% comment %} User card {% endcomment %}
     <a href="{% url 'dashboard' %}?type=users" class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-300">
       <div class="text-blue-600 text-4xl mb-4">
         <i class="fa-solid fa-user-tie"></i>
@@ -13,7 +12,7 @@
       <p class="text-gray-500">Show and Customize</p>
     </a>
     
-    <!-- টাস্ক কার্ড -->
+    {% comment %} Task card {% endcomment %}
     <a href="{% url 'dashboard' %}?type=all"  class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-300">
       <div class="text-green-600 text-4xl mb-4">
         <i class="fa-solid fa-list-check"></i>
@@ -22,7 +21,7 @@
       <p class="text-gray-500">Access and Update</p>
     </a>
     
-    <!-- প্রোজেক্ট কার্ড -->
+    {% comment %} Projects card {% endcomment %}
     <a href="{% url 'dashboard' %}?type=projects"  class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-300">
       <div class="text-purple-600 text-4xl mb-4">
         <i class="fa-solid fa-bars-progress"></i>
@@ -31,7 +30,7 @@
       <p class="text-gray-500">Access and Update</p>
     </a>
     
-    <!-- গ্রুপ কার্ড -->
+    {% comment %} Groups card {% endcomment %}
     <a href="{% url 'dashboard' %}?type=groups"  class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-300">
       <div class="text-orange-600 text-4xl mb-4">
         <i class="fa-solid fa-people-group"></i>
@@ -41,7 +40,8 @@
     </a>
   </div>
 
-  <!-- ইউজার লিস্ট -->
+  
+  {% include "dashboard/messages.html" %}
   <div class="mt-8 p-6">
     {% if users %}
       {% include "admin/user_list.html" %}
